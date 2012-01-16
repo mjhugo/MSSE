@@ -1,5 +1,9 @@
 # Object Relational Mapping in Grails
 
+-----------
+
+# Object Relational Mapping in Grails
+
 - Grails Object Relational Mapping
 - Constraints/Validation
 - Relationships
@@ -25,7 +29,7 @@
 The **domain** subdirectory is for any class that you want to be persistent. 
 These classes are automatically mapped to the DB through Hibernate (or other GORM implementation)
 
-----------
+-------
 
 # Database Creation Magic
 
@@ -71,8 +75,6 @@ TODO
 -----------
 
 
-<span class="notes">class name becomes table name</span>
-
 <pre class="brush: groovy; highlight:[1]">
 	class Customer {
 		String name
@@ -84,21 +86,21 @@ TODO
 
 <pre class="brush: text; highlight:[1]">
 	mysql> describe customer;
-	+----------------+--------------+------+-----+---------+----------------+
-	| Field          | Type         | Null | Key | Default | Extra          |
-	+----------------+--------------+------+-----+---------+----------------+
-	| id             | bigint(20)   | NO   | PRI | NULL    | auto_increment | 
-	| version        | bigint(20)   | NO   |     | NULL    |                | 
-	| account_number | varchar(255) | NO   |     | NULL    |                | 
-	| name           | varchar(255) | NO   |     | NULL    |                | 
-	+----------------+--------------+------+-----+---------+----------------+
+	+----------------+--------------+------+-----+---------+
+	| Field          | Type         | Null | Key | Default |
+	+----------------+--------------+------+-----+---------+
+	| id             | bigint(20)   | NO   | PRI | NULL    |
+	| version        | bigint(20)   | NO   |     | NULL    |
+	| account_number | varchar(255) | NO   |     | NULL    |
+	| name           | varchar(255) | NO   |     | NULL    |
+	+----------------+--------------+------+-----+---------+
 	4 rows in set (0.02 sec)
 </pre>
 
+<span class="notes">class name becomes table name</span>
+
 
 --------
-
-<span class="notes">attribute names are converted into column names</span>
 
 <pre class="brush: groovy; highlight:[2,3]">
 	class Customer {
@@ -122,9 +124,10 @@ TODO
 	4 rows in set (0.02 sec)
 </pre>
 
---------
+<span class="notes">attribute names are converted into column names</span>
 
-<span class="notes">id (PK) and version (optimistic locking) columns are added to DB, but don’t need to be explicitly specified in code</span>
+
+--------
 
 <pre class="brush: groovy">
 	class Customer {
@@ -147,6 +150,8 @@ TODO
 	+----------------+--------------+------+-----+---------+----------------+
 	4 rows in set (0.02 sec)
 </pre>
+
+<span class="notes">id (PK) and version (optimistic locking) columns are added to DB, but don’t need to be explicitly specified in code</span>
 
 --------
 
