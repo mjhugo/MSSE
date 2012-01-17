@@ -97,11 +97,11 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 ---------------
 
-![DB Console Login](dbconsolelogin.png "DB Console Login")
+![DB Console Login](images/dbconsolelogin.png "DB Console Login")
 
 ---------------
 
-![DB Console](dbconsole.png "DB Console")
+![DB Console](images/dbconsole.png "DB Console")
 
 -----------
 
@@ -363,7 +363,7 @@ delete from customer where id=? and version=?
 
 # Locking
 
-![Optimistic Locking illustrated](optimisticPessimistic.jpg "http://www.toadworld.com/Portals/0/GuyH/Contention/Feb2008/optimisticPessimistic.jpg")
+![Optimistic Locking illustrated](images/optimisticPessimistic.jpg "http://www.toadworld.com/Portals/0/GuyH/Contention/Feb2008/optimisticPessimistic.jpg")
 
 <cite>http://www.toadworld.com/Portals/0/GuyH/
 	Contention/Feb2008/optimisticPessimistic.jpg</cite>
@@ -795,7 +795,7 @@ customer.save()
 
 # One to Many
 
-![one to many](oneToMany.png "One To Many")
+![one to many](images/oneToMany.png "One To Many")
 
 - use "static hasMany = ..." definition
 - inserts and updates are cascaded
@@ -805,7 +805,7 @@ customer.save()
 
 # One to Many
 
-![one to many](oneToMany.png "One To Many")
+![one to many](images/oneToMany.png "One To Many")
 
 - default is java.util.Set; can use
 	- SortedSet (must implement comparable)
@@ -842,7 +842,7 @@ c.delete()
 
 # Many to Many
 
-![many to many](manyToMany.png "Many To Many")
+![many to many](images/manyToMany.png "Many To Many")
 
 - both sides define hasMany
 - must define an owner (using belongsTo on the owned object)
@@ -851,7 +851,7 @@ c.delete()
 
 # Many to Many
 
-![many to many](manyToMany.png "Many To Many")
+![many to many](images/manyToMany.png "Many To Many")
 
 <pre class="brush:groovy;">
 class Customer { 
