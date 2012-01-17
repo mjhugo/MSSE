@@ -3,7 +3,7 @@ h1, h2, h3, h4, h5, h6, p, ul, li {
 }
 
 p, ul, li {
-    color: #555753 !important;
+    color: black !important;
 /*    font-size: 120% !important;*/
 }
 
@@ -154,9 +154,14 @@ section, .slide header:only-child h1 {
   text-shadow: rgba(0, 0, 0, 0.2) 0 2px 5px;
   margin-left: 30px;
   margin-right: 30px;
-  margin-top: 100px;
+  margin-top: 80px;
   display: block;
   overflow: hidden;
+}
+
+/*If no header for the slide, only use 20px padding*/
+.slide section:first-child {
+  margin-top: 20px;
 }
 
 section img.align-center {
