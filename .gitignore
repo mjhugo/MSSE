@@ -4,3 +4,5 @@
 /GORM/calltrack/stacktrace.log
 /GORM/calltrack/target
 *.iml
+target/
+classes
