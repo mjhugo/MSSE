@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+	<title>AdvancedGORM</title>
+	
+	<meta name="description" content="AdvancedGORM">
+	<meta name="author" content="Mike Hugo">
+	<meta name="viewport" content="width=1024, user-scalable=no">
+	
+	<!-- Core and extension CSS files -->
+	<link rel="stylesheet" href="../deck.js/core/deck.core.css">
+	<link rel="stylesheet" href="../deck.js/extensions/goto/deck.goto.css">
+	<link rel="stylesheet" href="../deck.js/extensions/menu/deck.menu.css">
+	<link rel="stylesheet" href="../deck.js/extensions/navigation/deck.navigation.css">
+	<link rel="stylesheet" href="../deck.js/extensions/status/deck.status.css">
+	<link rel="stylesheet" href="../deck.js/extensions/hash/deck.hash.css">
+	
+	<!-- Theme CSS files (menu swaps these out) -->
+	<link rel="stylesheet" id="style-theme-link" href="../deck.js/themes/style/swiss.css">
+	<link rel="stylesheet" id="style-theme-link" href="../deck.js.custom/themes/style/msse.css">
+	<link rel="stylesheet" id="transition-theme-link" href="../deck.js/themes/transition/horizontal-slide.css">
+
+	<link href="../deck.js.custom/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
+	<link href="../deck.js.custom/syntaxhighlighter/styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
+
+	<script src="../deck.js/modernizr.custom.js"></script>
+</head>
+
+<body class="deck-container">
+<div class="slide">
+<h1>Advanced GORM</h1>
+<ul>
+  <li>Dynamic finders</li>
+  <li>Hibernate Query Language (HQL)</li>
+  <li>Criteria Builder</li>
+  <li>Where Queries</li>
+  <li>Named Queries</li>
+  <li>Events / Automatic timestamping</li>
+</ul>
+</div><div class="slide"><h1>Dynamic Finders</h1>
+<ul>
+  <li>Synthesized at runtime (not compiled)</li>
+  <li>Made of up to two properties, boolean operators and comparators</li>
+  <li>Additional parameters can be passed for pagination and sorting</li>
+</ul>
+</div><div class="slide"><h1>Dynamic Finders</h1>
+<ul>
+  <li>findAllBy
+  <ul>
+    <li>returns list of objects</li>
+  </ul></li>
+  <li>findBy
+  <ul>
+    <li>returns single object</li>
+  </ul></li>
+</ul>
+</div><div class="slide"><h1>Dynamic Finders</h1>
+<pre class="brush:groovy; highlight:[]; class-name:doubleline">
+	findByName('mike')
+	findAllByName('mike')
+	findAllByNameAndAccountNumber('mike', '123')
+	findAllByNameOrAccountNumber('mike', '789')
+	findAllByNameLike('J%')
+	findAllByNameIlike('j%', [sort:'name'])
+	findAllByNameIlike('j%', [order:'desc',sort:'name'])
+	findAllByNameIlike('j%', 
+		[order:'desc', sort:'name', max:10, offset:0])
+</pre>
+</div><div class="slide"><h1>meta programming</h1>
+</div><div class="slide"><h1>modify runtime behavior</h1>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[]; class-name:doubleline">
+	class Person {
+	    String name
+	    Integer age
+	}
+	Person.findByName('Mike')
+</pre>
+</div><div class="slide"><h1>metaClass</h1>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[];">
+def fakeDb = [new Person(name:'Mike', gender:'M'),
+	new Person(name:'Robin', gender:'F')]
+
+class Person {
+    String name
+    String gender
+    String toString() {name}
+}
+
+// define a metaClass method on Person
+Person.metaClass.static.findByName = { String name->
+    return fakeDb.findAll {it.name == name}
+}
+
+Person.findByName('Robin')
+</pre>
+</div><div class="slide"><h1>invokeMethod</h1>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[5,6,7,8,9,10]; class-name:doubleline">
+	class AddressBook {
+	   def people = [new Person(name:'Mike', gender:'M'),
+	       new Person(name:'Robin', gender:'F')]
+
+	   def invokeMethod(String name, args) {
+	        def propToFind = name - 'findBy'
+	        people.findAll {
+	            it[propToFind.toLowerCase()] == args[0]
+	        }
+		}
+	}
+	
+	def ab = new AddressBook() 
+	ab.findByName('Robin') 
+	ab.findByGender('F')
+</pre>
+</div><div class="slide"><h1>methodMissing</h1>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[5,6]; class-name:doubleline">
+class AddressBook {
+	static people = [new Person(name:'Mike', gender:'M'),
+		new Person(name:'Robin', gender:'F')]
+
+	// intercept
+	def methodMissing(String name, args) {
+		println 'inside methodMissing'
+		def impl = { Object[] theArgs ->
+			def propToFind = name - 'findBy'
+			people.findAll {
+				it[propToFind.toLowerCase()] == args[0]
+			}
+		}
+		// cache
+		AddressBook.metaClass."${name}" = impl
+		// invoke
+		return impl(args)
+	}
+}
+def ab = new AddressBook()
+ab.findByName('Robin')
+</pre><p>intercept</p>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[14,15]; class-name:doubleline">
+class AddressBook {
+	static people = [new Person(name:'Mike', gender:'M'),
+		new Person(name:'Robin', gender:'F')]
+
+	// intercept
+	def methodMissing(String name, args) {
+		println 'inside methodMissing'
+		def impl = { Object[] theArgs ->
+			def propToFind = name - 'findBy'
+			people.findAll {
+				it[propToFind.toLowerCase()] == args[0]
+			}
+		}
+		// cache
+		AddressBook.metaClass."${name}" = impl
+		// invoke
+		return impl(args)
+	}
+}
+def ab = new AddressBook()
+ab.findByName('Robin')
+</pre><p>cache</p>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[16,17]; class-name:doubleline">
+class AddressBook {
+	static people = [new Person(name:'Mike', gender:'M'),
+		new Person(name:'Robin', gender:'F')]
+
+	// intercept
+	def methodMissing(String name, args) {
+		println 'inside methodMissing'
+		def impl = { Object[] theArgs ->
+			def propToFind = name - 'findBy'
+			people.findAll {
+				it[propToFind.toLowerCase()] == args[0]
+			}
+		}
+		// cache
+		AddressBook.metaClass."${name}" = impl
+		// invoke
+		return impl(args)
+	}
+}
+def ab = new AddressBook()
+ab.findByName('Robin')
+</pre><p>invoke</p>
+</div><div class="slide"><h1>summary</h1>
+</div><div class="slide">
+<ul>
+  <li><p>First Time</p>
+  <ul>
+    <li>ab.findByName('Robin')</li>
+    <li>invokeMethod</li>
+    <li>methodMissing</li>
+    <li>method cached</li>
+    <li>method invokved</li>
+  </ul></li>
+  <li><p>Second Time</p>
+  <ul>
+    <li>ab.findByName('Robin')</li>
+    <li>invokeMethod</li>
+    <li>method invoked</li>
+  </ul></li>
+</ul>
+</div><div class="slide"><h1>Problem</h1>
+<ul>
+  <li>Something more advanced than a dynamic finder</li>
+  <li>Dynamic finders are great, but can lead to programmer laziness and performance issues</li>
+  <li>example, find all customers with gold service level and more than 5 incidents</li>
+</ul>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[]; class-name:doubleline">
+
+def gold = ServiceLevel.findByName('Gold')
+List goldCustomers = Customer.findAllByServiceLevel(gold)
+List moreThanFive = goldCustomers.findAll { cust->
+    cust.incidents.size() > 5
+}
+</pre>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[]; class-name:doubleline">
+
+select
+from service_level where name = ?
+select from customer where service_level_id = ?
+￼￼def gold = ServiceLevel.findByName('Gold')
+List goldCustomers = Customer.findAllByServiceLevel(gold)
+List moreThanFive = goldCustomers.findAll { cust->
+    cust.incidents.size() > 5
+}
+select
+from incident
+where customer_id = ?
+(for each customer)
+iterates through list of customers
+</pre>
+</div><div class="slide"><h1>HQL</h1>
+<ul>
+  <li>Hibernate Query Language</li>
+  <li>SQL-like query language using domain names rather than DB names</li>
+</ul>
+</div><div class="slide"><h1>HQL</h1><p>Customer.findAll( ! "from Customer as c where c.name = 'Mike'") Customer.findAll( ! "from Customer as c where c.name = ?", ! ['Mike']) Customer.findAll( ! "from Customer as c where c.name = :name",  [name:'mike'])</p>
+</div><div class="slide"><h1>methods</h1>
+<ul>
+  <li>find</li>
+  <li>findAll</li>
+  <li>executeQuery</li>
+  <li>executeUpdate</li>
+</ul>
+</div><div class="slide"><h1>find / findAll</h1>
+<ul>
+  <li>find: returns a single object (first found)</li>
+  <li>findAll: returns a list of objects</li>
+</ul>
+</div><div class="slide"><p>Customer.findAll(  "from Customer as c  inner join fetch c.address  where c.serviceLevel.name = ?  and size(c.incidents) &gt; 5", ￼￼￼￼￼['Gold']) ￼parameter properties</p>
+</div><div class="slide"><h1>executeQuery</h1>
+<ul>
+  <li>doesn’t return a domain class</li>
+  <li>good for getting a subset of data
+  <ul>
+    <li>loading a single column</li>
+    <li>count, min, max, etc</li>
+  </ul></li>
+</ul>
+</div><div class="slide"><p>￼Address.executeQuery(  "select distinct state, count(*)  from Address  group by state") Returns a list of results, where each result is a list itself, e.g.: [ [MN, 5], [WI, 10] ]</p>
+</div><div class="slide"><h1>executeUpdate</h1>
+<ul>
+  <li>Data Manipulation
+  <ul>
+    <li>UPDATE</li>
+    <li>DELETE</li>
+  </ul></li>
+  <li>e.g. update all silver statuses to platinum</li>
+  <li>delete all accounts with no activity in the 90 days</li>
+</ul>
+</div><div class="slide"><p>￼Customer.executeUpdate(  "update Customer c  set c.serviceLevel = :newSl  where c.serviceLevel = :oldSl", [newSl:ServiceLevel.findByName('SuperAwesome'),  oldSl: ServiceLevel.findByName('Gold')]) named parameters named parameters</p>
+</div><div class="slide"><h1>Criteria</h1>
+<ul>
+  <li>Grails provides a Hibernate Criteria Builder</li>
+  <li>Useful for forming dynamic queries</li>
+  <li>Two methods:
+  <ul>
+    <li>createCriteria</li>
+    <li>withCriteria - inline criteria builder</li>
+  </ul></li>
+</ul>
+</div><div class="slide"><h1>restrictions</h1>
+<ul>
+  <li><code>eq</code> - equal</li>
+  <li><code>ilike</code> - case insensitive like (wildcard: %) like - case sensitive like (wildcard: %)</li>
+  <li><code>in</code> - in a list</li>
+  <li><code>isNull</code></li>
+  <li><code>lt</code>, <code>le</code> - less than; less than or equal</li>
+  <li><code>gt</code>, <code>ge</code> - greater than; greater than or equal</li>
+</ul>
+</div><div class="slide"><h1>query methods</h1>
+<ul>
+  <li>list - (default) returns all matching rows</li>
+  <li>listDistinct - return a distinct set of results</li>
+  <li>get - retrieve one row (useful for projections)</li>
+  <li>scroll - returns a scrollable result set</li>
+</ul>
+</div><div class="slide"><h1>Criteria</h1><p>== ￼Customer.withCriteria {  eq('name', 'mike') } ￼def c = Customer.createCriteria() c{  eq('name', 'mike') } ￼def c = Customer.createCriteria() c{  or {  eq('name', 'mike')  eq('accountNumber', '789') } } == ￼￼findAllByNameOrAccountNumber('mike', '789')</p>
+</div><div class="slide"><p>￼def customerByName(nameToFind) {  def c = Customer.createCriteria()  return c.list() {  eq('name', nameToFind)  } } // same as: def customerByName(nameToFind) {  return Customer.withCriteria {  eq('name', nameToFind)  } }</p>
+</div><div class="slide"><h1>Example</h1>
+<ul>
+  <li>simple: find all customers by name</li>
+  <li>find all customers with gold service level and more than 5 incidents</li>
+  <li>Advanced Search function
+  <ul>
+    <li>name</li>
+    <li>account number</li>
+    <li>state</li>
+  </ul></li>
+</ul>
+</div><div class="slide"><p>￼def goldWithFiveCriteria() { def c = Customer.createCriteria() return c.list() {  serviceLevel {  eq('name', 'Gold') }  sizeGt('incidents', 5)  } }</p>
+</div><div class="slide"><p>￼def search(accountNumber, name, state) { def c = Customer.createCriteria() return c.list {  or {  if (accountNumber){  ilike('accountNumber', "${accountNumber}%")  }  if (name){  ilike('name', "${name}%") } }  if (state &amp;&amp; state != 'null'){  address { } } }  eq('state', state) }</p>
+</div><div class="slide"><p>￼def c = Customer.createCriteria() def results = c.scroll() {  address {  eq('state', 'MN') } } results.first() println results.get() results.next() println results.get() results.last() println results.get() results.next() println results.get() // yields: [Victoria Benjamin (5)]
+[Sybill Cline (50)] [Len Small (157)] null</p>
+</div><div class="slide"><p>￼def c = Customer.createCriteria() def result = c.get() {  projections {  countDistinct('serviceLevel') } } println result // yields: 3</p>
+</div><div class="slide"><h1>Named Queries</h1>
+<ul>
+  <li>Since Grails 1.2 http://grails.org/doc/latest/ref/Domain %20Classes/namedQueries.html</li>
+  <li>Allow you to define criteria queries as part of the domain class</li>
+  <li>Can be chained together</li>
+  <li>Can be combined with dynamic finders Break down queries into components</li>
+</ul>
+</div><div class="slide"><h1>Auto Timestamping</h1>
+<ul>
+  <li>Two special properties for domain classes
+  <ul>
+    <li>dateCreated</li>
+    <li>lastUpdated</li>
+  </ul></li>
+  <li>Must be nullable</li>
+  <li>Will be set automatically when object is persisted to the database</li>
+</ul>
+</div><div class="slide"><h1>Events</h1>
+<ul>
+  <li>beforeInsert - Executed before an object is initially persisted to the database</li>
+  <li>beforeUpdate - Executed before an object is updated</li>
+  <li>beforeDelete - Executed before an object is deleted</li>
+  <li>beforeValidate - Executed before an object is validated</li>
+  <li>afterInsert - Executed after an object is persisted to the database</li>
+  <li>afterUpdate - Executed after an object has been updated</li>
+  <li>afterDelete - Executed after an object has been deleted</li>
+  <li>onLoad - Executed when an object is loaded from the database</li>
+</ul>
+</div>
+
+<a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+<a href="#" class="deck-next-link" title="Next">&#8594;</a>
+
+<p class="deck-status">
+	<span class="deck-status-current"></span>
+	/
+	<span class="deck-status-total"></span>
+</p>
+
+<form action="." method="get" class="goto-form">
+	<label for="goto-slide">Go to slide:</label>
+	<input type="text" name="slidenum" id="goto-slide" list="goto-datalist">
+	<datalist id="goto-datalist"></datalist>
+	<input type="submit" value="Go">
+</form>
+
+<a href="." title="Permalink to this slide" class="deck-permalink">#</a>
+
+
+<script src="../deck.js/jquery-1.7.min.js"></script>
+
+<!-- Deck Core and extensions -->
+<script src="../deck.js/core/deck.core.js"></script>
+<script src="../deck.js/extensions/hash/deck.hash.js"></script>
+<script src="../deck.js/extensions/menu/deck.menu.js"></script>
+<script src="../deck.js/extensions/goto/deck.goto.js"></script>
+<script src="../deck.js/extensions/status/deck.status.js"></script>
+<script src="../deck.js/extensions/navigation/deck.navigation.js"></script>
+
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushPlain.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushGroovy.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushSql.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+
+<script src="../deck.js.custom/init.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	SyntaxHighlighter.defaults['toolbar'] = false;
+    SyntaxHighlighter.all()
+</script>
+
+</body>
+</html>

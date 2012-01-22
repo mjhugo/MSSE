@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+	<title>GORM</title>
+	
+	<meta name="description" content="GORM">
+	<meta name="author" content="Mike Hugo">
+	<meta name="viewport" content="width=1024, user-scalable=no">
+	
+	<!-- Core and extension CSS files -->
+	<link rel="stylesheet" href="../deck.js/core/deck.core.css">
+	<link rel="stylesheet" href="../deck.js/extensions/goto/deck.goto.css">
+	<link rel="stylesheet" href="../deck.js/extensions/menu/deck.menu.css">
+	<link rel="stylesheet" href="../deck.js/extensions/navigation/deck.navigation.css">
+	<link rel="stylesheet" href="../deck.js/extensions/status/deck.status.css">
+	<link rel="stylesheet" href="../deck.js/extensions/hash/deck.hash.css">
+	
+	<!-- Theme CSS files (menu swaps these out) -->
+	<link rel="stylesheet" id="style-theme-link" href="../deck.js/themes/style/swiss.css">
+	<link rel="stylesheet" id="style-theme-link" href="../deck.js.custom/themes/style/msse.css">
+	<link rel="stylesheet" id="transition-theme-link" href="../deck.js/themes/transition/horizontal-slide.css">
+
+	<link href="../deck.js.custom/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
+	<link href="../deck.js.custom/syntaxhighlighter/styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
+
+	<script src="../deck.js/modernizr.custom.js"></script>
+</head>
+
+<body class="deck-container">
+<div class="slide">
+<h1>Object Relational Mapping in Grails</h1>
+</div><div class="slide"><h2>Object Relational Mapping in Grails</h2>
+<ul>
+  <li>Grails Object Relational Mapping</li>
+  <li>CRUD</li>
+  <li>Constraints/Validation</li>
+  <li>Relationships</li>
+</ul>
+</div><div class="slide"><h1>Domain Class Basics</h1>
+</div><div class="slide"><h2>Domain Class Location Convention</h2>
+<pre class="brush: text; highlight:[6]">
+	|____grails-app
+	| |____conf
+	| | |____hibernate
+	| | |____spring
+	| |____controllers
+	| |____domain
+	| |____i18n
+	| |____services
+	| |____taglib
+	| |____utils
+	| |____views
+</pre><p>The <strong>domain</strong> subdirectory is for any class that you want to be persistent. These classes are automatically mapped to the DB through Hibernate (or other GORM implementation)</p>
+</div><div class="slide"><h2>Database Creation Magic</h2>
+<pre class="brush: groovy; highlight:[11]">
+	dataSource {
+		pooled = false
+		username = "sa"
+		password = ""
+	    loggingSql = true
+	}
+	
+	environments {
+		development {
+			dataSource {
+				dbCreate = "create-drop"
+				//...
+			}
+		}
+		test {
+		//...
+</pre>
+</div><div class="slide"><h2>DB creation options</h2>
+<ul>
+  <li>create-drop
+  <ul>
+    <li>Drop and re-create the database when Grails is run</li>
+  </ul></li>
+  <li>create
+  <ul>
+    <li>Create the database if it doesn't exist, but don't modify it if it does</li>
+  </ul></li>
+  <li>update
+  <ul>
+    <li>Create the database if it doesn't exist, and modify it if it does exist</li>
+  </ul></li>
+  <li>not defined
+  <ul>
+    <li>do nothing to the database</li>
+  </ul></li>
+</ul>
+</div><div class="slide"><h2>DB Console</h2>
+<ul>
+  <li>grails run-app</li>
+  <li>browse to http://localhost:8080/dbconsole</li>
+  <li>use driver, username, password, url from <code>grails-app/conf/DataSource.groovy</code></li>
+</ul>
+<pre class="brush: groovy; highlight:[2,3,4, 10]">
+	dataSource {
+	    driverClassName = "org.h2.Driver"
+	    username = "sa"
+	    password = ""
+	}
+	environments {
+	    development {
+	        dataSource {
+	            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+	            url = "jdbc:h2:mem:devDb;MVCC=TRUE"
+	        }
+	    }
+</pre>
+</div><div class="slide"><p><img src="images/dbconsolelogin.png"  alt="DB Console Login"/></p>
+</div><div class="slide"><p><img src="images/dbconsole.png"  alt="DB Console"/></p>
+</div><div class="slide">
+<pre class="brush: groovy; highlight:[1]">
+	class Customer {
+		String name
+		String accountNumber
+	}
+</pre>
+<hr>
+<pre class="brush: text; highlight:[1]">
+	mysql> describe customer;
+	+----------------+--------------+------+-----+---------+
+	| Field          | Type         | Null | Key | Default |
+	+----------------+--------------+------+-----+---------+
+	| id             | bigint(20)   | NO   | PRI | NULL    |
+	| version        | bigint(20)   | NO   |     | NULL    |
+	| account_number | varchar(255) | NO   |     | NULL    |
+	| name           | varchar(255) | NO   |     | NULL    |
+	+----------------+--------------+------+-----+---------+
+	4 rows in set (0.02 sec)
+</pre><p><span class="notes">class name becomes table name</span></p>
+</div><div class="slide">
+<pre class="brush: groovy; highlight:[2,3]">
+	class Customer {
+		String name
+		String accountNumber
+	}
+</pre>
+<hr>
+<pre class="brush: text; highlight:[7,8]">
+	mysql> describe customer;
+	+----------------+--------------+------+-----+---------+----------------+
+	| Field          | Type         | Null | Key | Default | Extra          |
+	+----------------+--------------+------+-----+---------+----------------+
+	| id             | bigint(20)   | NO   | PRI | NULL    | auto_increment | 
+	| version        | bigint(20)   | NO   |     | NULL    |                | 
+	| account_number | varchar(255) | NO   |     | NULL    |                | 
+	| name           | varchar(255) | NO   |     | NULL    |                | 
+	+----------------+--------------+------+-----+---------+----------------+
+	4 rows in set (0.02 sec)
+</pre><p><span class="notes">attribute names are converted into column names</span></p>
+</div><div class="slide">
+<pre class="brush: groovy">
+	class Customer {
+		String name
+		String accountNumber
+	}
+</pre>
+<hr>
+<pre class="brush: text; highlight:[5,6]">
+	mysql> describe customer;
+	+----------------+--------------+------+-----+---------+----------------+
+	| Field          | Type         | Null | Key | Default | Extra          |
+	+----------------+--------------+------+-----+---------+----------------+
+	| id             | bigint(20)   | NO   | PRI | NULL    | auto_increment | 
+	| version        | bigint(20)   | NO   |     | NULL    |                | 
+	| account_number | varchar(255) | NO   |     | NULL    |                | 
+	| name           | varchar(255) | NO   |     | NULL    |                | 
+	+----------------+--------------+------+-----+---------+----------------+
+	4 rows in set (0.02 sec)
+</pre><p><span class="notes">id (PK) and version (optimistic locking) columns are added to DB, but don’t need to be explicitly specified in code</span></p>
+</div><div class="slide"><h2>ID and Version - invisible attributes?</h2>
+<ul>
+  <li>ID and Version were added to the DB table for Customer</li>
+  <li>Where did they come from?</li>
+</ul>
+</div><div class="slide"><h2>javap</h2>
+<pre class="brush: text; highlight:[7,8]">
+	javap Customer
+	Compiled from "Customer.groovy"
+	public class calltrack.Customer 
+		extends java.lang.Object 
+		implements groovy.lang.GroovyObject {
+
+			java.lang.Long id;
+			java.lang.Long version;
+			
+			private java.lang.String name;
+			private java.lang.String accountNumber;
+			
+			//. getters, setters, etc
+		}
+</pre>
+</div><div class="slide"><h1>CRUD</h1>
+</div><div class="slide"><h2>CRUD</h2>
+<ul>
+  <li>Four basic functions of persistent storage:
+  <ul>
+    <li>CREATE - <code>INSERT</code></li>
+    <li>READ - <code>SELECT</code></li>
+    <li>UPDATE - <code>UPDATE</code></li>
+    <li>DELETE - <code>DELETE</code></li>
+  </ul></li>
+</ul>
+</div><div class="slide"><h2>SQL Logging</h2>
+<ul>
+  <li>turn on SQL logging with <code>logSql = true</code> in <code>grails-app/conf/DataSource.groovy</code></li>
+</ul>
+<pre class="brush: groovy; highlight:[5]">
+	dataSource {
+		pooled = false
+		username = "sa"
+		password = ""
+	    logSql = true
+	}
+</pre>
+</div><div class="slide"><h2>Create</h2>
+<pre class="brush: java; highlight:[4]">
+    void testCreate() {
+        Customer customer = 
+			new Customer(name: 'Mike', accountNumber: '123')
+        customer.save()
+    }	
+</pre>
+<hr>
+<pre class="brush: sql;">
+	INSERT INTO customer
+	    (
+	        id, version, account_number, date_created, name
+	    )
+	    VALUES
+	    (
+	        NULL, ?, ?, ?, ?
+	    );
+</pre>
+</div><div class="slide"><h2>Read</h2>
+<pre class="brush: java; highlight:[2,5]">
+    void testRead() {
+        Customer customer = Customer.read(1)
+    }
+    void testGet() {
+        Customer customer = Customer.get(1)
+    }
+</pre>
+<hr>
+<pre class="brush: sql;">
+	SELECT
+	    customer0_.id             AS id0_0_,
+	    customer0_.version        AS version0_0_,
+	    customer0_.account_number AS account3_0_0_,
+	    customer0_.date_created   AS date4_0_0_,
+	    customer0_.name           AS name0_0_
+	FROM
+	    customer customer0_
+	WHERE
+	    customer0_.id=?
+</pre>
+</div><div class="slide"><h2>Update</h2>
+<pre class="brush: java; highlight:[8]">
+void testUpdate() {
+    //setup
+    def c = new Customer(name: 'Mike',
+            accountNumber: '123').save()
+    //update
+    Customer customer = Customer.get(c.id)
+    customer.name = 'new value'
+    customer.save()
+}
+</pre>
+<hr>
+<pre class="brush: sql;">
+	UPDATE customer
+	SET
+	    version=?,
+	    account_number=?,
+	    date_created=?,
+	    name=?
+	WHERE
+	    id=?
+	AND version=?
+</pre>
+</div><div class="slide"><h2>Implicit Update</h2>
+<pre class="brush: java; highlight:[15, 16, 17]">
+void testUpdateImplicit() {
+    assert 0 == Customer.count()
+
+    def c = new Customer(name: 'Mike', accountNumber: '123');
+    c.save();
+
+    c.name = 'Jim'
+    c.save()
+
+    assert c.name == Customer.get(c.id).name
+
+    // beware the implicit update
+    c.name = 'John'
+
+    // even though c.save() hasn't been called,
+    // the new name 'John' has been persisted!
+    assert 'John' == Customer.get(c.id).name
+}
+</pre>
+</div><div class="slide"><h2>Delete</h2>
+<pre class="brush: java; highlight:[7]">
+void testDelete() {
+    //setup
+    def c = new Customer(name: 'Mike',
+            accountNumber: '123').save()
+    //delete
+    Customer customer = Customer.get(c.id)
+    customer.delete()
+}
+</pre>
+<hr>
+<pre class="brush: sql;">
+delete from customer where id=? and version=?
+</pre>
+</div><div class="slide"><h2>Locking</h2><p><img src="images/optimisticPessimistic.jpg"  alt="Optimistic Locking illustrated"/></p><p><cite>http://www.toadworld.com/Portals/0/GuyH/  Contention/Feb2008/optimisticPessimistic.jpg</cite></p>
+</div><div class="slide"><h2>Optimistic Locking (Default)</h2>
+<ul>
+  <li>Version column</li>
+</ul>
+<pre class="brush: sql;">
+delete from customer where id=? and version=?
+</pre>
+<pre class="brush: sql; highlight:[3,9]">
+	UPDATE customer
+	SET
+	    version=?,
+	    account_number=?,
+	    date_created=?,
+	    name=?
+	WHERE
+	    id=?
+	AND version=?
+</pre>
+<ul>
+  <li>Version incremented with each update</li>
+</ul>
+</div><div class="slide"><h2>Pessimistic Locking</h2>
+<pre class="brush: java; highlight:[7]">
+void testLock() {
+	//setup
+	def c = new Customer(name: 'Mike',
+	 	accountNumber: '123').save()
+	//use lock method to perform SELECT ... FOR UPDATE
+	Customer.withTransaction {
+	    Customer customer = Customer.lock(c.id)
+	    customer.name = 'John'
+	    customer.save(flush: true)
+	}
+	// lock is automatically released at end of transaction
+	assert 'John' == Customer.get(c.id).name
+}
+</pre>
+</div><div class="slide"><h2>Constraints and Validation</h2>
+<ul>
+  <li>By default, all properties are required (i.e. can’t be NULL)</li>
+</ul>
+<pre class="brush: groovy;">
+def c = new Customer()
+c.save()
+println c.errors
+</pre>
+<pre class="brush: text;highlight:[5,8]">
+org.springframework.validation.BeanPropertyBindingResult:
+  2 errors
+Field error in object 'Customer' on field 'accountNumber': 
+	rejected value [null]; codes [......; default message 
+	[Property [{0}] of class [{1}] cannot be null]
+Field error in object 'Customer' on field 'name': 
+	rejected value [null]; codes [......; default message 
+	[Property [{0}] of class [{1}] cannot be null]
+</pre>
+</div><div class="slide"><h2>Constraints closure</h2>
+<ul>
+  <li>By default, all properties are required (i.e. can’t be NULL)</li>
+</ul>
+<pre class="brush: groovy;">
+class Customer { 
+	String name
+	String accountNumber
+}
+</pre><p>is the same as <pre class="brush: groovy;highlight:[4,5,6,7]"> class Customer {  String name  String accountNumber  static constraints = {  name(nullable:false)  accountNumber(nullable:false)  } } </pre></p>
+</div><div class="slide"><h2>Built In Constraints</h2>
+<ul>
+  <li><code>blank</code> - cannot be empty string</li>
+  <li><code>creditCard</code> - matches a credit card number</li>
+  <li><code>email</code> - valid email address</li>
+  <li><code>inList</code> - contained in a list of values</li>
+  <li><code>matches</code> - applies a regular expression</li>
+  <li><code>max</code> - maximum value of a class that implements comparable</li>
+  <li><code>min</code> - minimum value of a class that implements comparable</li>
+  <li><code>notEqual</code> - not equal to a specified value</li>
+</ul>
+</div><div class="slide"><h2>Built In Constraints</h2>
+<ul>
+  <li><code>nullable</code> - set to false for NOT NULL constraint</li>
+  <li><code>range</code> - within a min and max</li>
+  <li><code>scale</code> - performs rounding to a specified precision (doesn’t generate error messages)</li>
+  <li><code>size</code> - length of a string or collection</li>
+  <li><code>unique</code> - unique value</li>
+  <li><code>url</code> - URL address</li>
+  <li><code>validator</code> - custom validator</li>
+</ul>
+</div><div class="slide"><h2>Some constraints influence schema</h2>
+<pre class="brush: groovy;">
+String name
+String accountNumber
+String phone
+Date dateCreated
+static constraints = {
+	// name must be at least 2 chars; no more than 100
+	name(nullable:false, size:2..100)
+	// account number min length of 1 and max of 5 chars
+	accountNumber(nullable:true, size:1..5)
+	// phone number must be 10 digits
+	phone(nullable:true, matches: /(\d{10})?/)
+}
+</pre>
+</div><div class="slide">
+<pre class="brush: groovy; highlight:[4]">
+// ...
+static constraints = {
+	// name must be at least 2 chars; no more than 100
+	name(nullable:false, size:2..100)
+	// account number min length of 1 and max of 5 chars
+	accountNumber(nullable:true, size:1..5)
+	// phone number must be 10 digits
+	phone(nullable:true, matches: /(\d{10})?/)
+	// dateCreated not specified
+}
+</pre>
+<pre class="brush: text; highlight:[9]">
+mysql> describe customer;
++----------------+--------------+------+-----+---------+
+| Field          | Type         | Null | Key | Default |
++----------------+--------------+------+-----+---------+
+| id             | bigint(20)   | NO   | PRI | NULL    |
+| version        | bigint(20)   | NO   |     |         |
+| account_number | varchar(5)   | YES  |     | NULL    |
+| date_created   | datetime     | NO   |     |         |
+| name           | varchar(100) | NO   |     |         |
+| phone          | varchar(255) | YES  |     | NULL    |
++----------------+--------------+------+-----+---------+
+</pre><p>name field gets max length in DB of 100</p>
+</div><div class="slide">
+<pre class="brush: groovy; highlight:[6]">
+// ...
+static constraints = {
+	// name must be at least 2 chars; no more than 100
+	name(nullable:false, size:2..100)
+	// account number min length of 1 and max of 5 chars
+	accountNumber(nullable:true, size:1..5)
+	// phone number must be 10 digits
+	phone(nullable:true, matches: /(\d{10})?/)
+	// dateCreated not specified
+}
+</pre>
+<pre class="brush: text; highlight:[7]">
+mysql> describe customer;
++----------------+--------------+------+-----+---------+
+| Field          | Type         | Null | Key | Default |
++----------------+--------------+------+-----+---------+
+| id             | bigint(20)   | NO   | PRI | NULL    |
+| version        | bigint(20)   | NO   |     |         |
+| account_number | varchar(5)   | YES  |     | NULL    |
+| date_created   | datetime     | NO   |     |         |
+| name           | varchar(100) | NO   |     |         |
+| phone          | varchar(255) | YES  |     | NULL    |
++----------------+--------------+------+-----+---------+
+</pre><p>account number nullable and max length of 5</p>
+</div><div class="slide">
+<pre class="brush: groovy; highlight:[8]">
+// ...
+static constraints = {
+	// name must be at least 2 chars; no more than 100
+	name(nullable:false, size:2..100)
+	// account number min length of 1 and max of 5 chars
+	accountNumber(nullable:true, size:1..5)
+	// phone number must be 10 digits
+	phone(nullable:true, matches: /(\d{10})?/) // no size
+	// dateCreated not specified
+}
+</pre>
+<pre class="brush: text; highlight:[10]">
+mysql> describe customer;
++----------------+--------------+------+-----+---------+
+| Field          | Type         | Null | Key | Default |
++----------------+--------------+------+-----+---------+
+| id             | bigint(20)   | NO   | PRI | NULL    |
+| version        | bigint(20)   | NO   |     |         |
+| account_number | varchar(5)   | YES  |     | NULL    |
+| date_created   | datetime     | NO   |     |         |
+| name           | varchar(100) | NO   |     |         |
+| phone          | varchar(255) | YES  |     | NULL    |
++----------------+--------------+------+-----+---------+
+</pre><p>phone number gets default max size of 255 and nullable</p>
+</div><div class="slide">
+<pre class="brush: groovy; highlight:[9]">
+// ...
+static constraints = {
+	// name must be at least 2 chars; no more than 100
+	name(nullable:false, size:2..100)
+	// account number min length of 1 and max of 5 chars
+	accountNumber(nullable:true, size:1..5)
+	// phone number must be 10 digits
+	phone(nullable:true, matches: /(\d{10})?/) // no size
+	// dateCreated not specified
+}
+</pre>
+<pre class="brush: text; highlight:[8]">
+mysql> describe customer;
++----------------+--------------+------+-----+---------+
+| Field          | Type         | Null | Key | Default |
++----------------+--------------+------+-----+---------+
+| id             | bigint(20)   | NO   | PRI | NULL    |
+| version        | bigint(20)   | NO   |     |         |
+| account_number | varchar(5)   | YES  |     | NULL    |
+| date_created   | datetime     | NO   |     |         |
+| name           | varchar(100) | NO   |     |         |
+| phone          | varchar(255) | YES  |     | NULL    |
++----------------+--------------+------+-----+---------+
+</pre><p>date_created gets default not nullable</p>
+</div><div class="slide"><h1>Validation</h1>
+</div><div class="slide"><h2>Validation</h2>
+<ul>
+  <li>validation is implicitly called when .save() is called, but can also be called independently:</li>
+</ul>
+<pre class="brush:groovy;">
+groovy> def c = new Customer()
+groovy> println c.validate()
+false	
+</pre>
+<ul>
+  <li>if validation fails, errors are placed in the errors property of the domain class
+  <ul>
+    <li>can also check hasErrors()</li>
+  </ul></li>
+</ul>
+<pre class="brush:groovy;">
+groovy> def c = new Customer()
+groovy> c.validate()
+groovy> println c.hasErrors()
+true
+</pre>
+</div><div class="slide"><h2>Validation</h2>
+<ul>
+  <li>Note that by default .save() does not throw an exception if validation fails and entity is NOT persisted</li>
+</ul>
+<pre class="brush:groovy;">
+groovy> def c = new Customer()
+groovy> c.validate()
+groovy> println c.hasErrors()
+true
+</pre>
+<pre class="brush:sql;">
+mysql> select count (*) from customer;
++----------+
+| count(*) |
++----------+
+|        0 |
++----------+
+1 row in set (0.00 sec)
+</pre>
+</div><div class="slide"><h2>Validation</h2>
+<ul>
+  <li>Can be overridden by using “failOnError:true” in the .save() call</li>
+</ul>
+<pre class="brush:groovy;">
+groovy> new Customer().save(failOnError:true) 
+//...
+Exception thrown
+//...
+grails.validation.ValidationException: 
+  Validation Error(s) occurred during save():
+- Field error in object 'caller.Customer' on field 
+  'address': rejected value [null]; codes
+</pre>
+<ul>
+  <li>Can also be overridden globally in <code>grails-app/conf/Config.groovy</code>
+  <ul>
+    <li><code>grails.gorm.failOnError=true</code></li>
+  </ul></li>
+</ul>
+</div><div class="slide"><h1>Relationships</h1>
+</div><div class="slide"><h2>Many to One - Unidirectional</h2>
+<pre class="brush:groovy;">
+class Customer {
+	Address address
+}
+class Address {
+}	
+</pre>
+<ul>
+  <li>Unidirectional many-to-one relationship from Customer to Address</li>
+  <li>Address is not aware of Customer</li>
+</ul>
+</div><div class="slide"><h2>Many to One - Unidirectional</h2>
+<pre class="brush:groovy;">
+class Customer {
+	Address address
+}
+class Address {
+}	
+
+customer.address = new Address()
+customer.save()
+//transient object exception 
+
+def address = new Address()
+address.save()
+customer.address = address
+customer.save()
+//OK
+</pre>
+<ul>
+  <li>Updates do not cascade</li>
+</ul>
+</div><div class="slide"><h2>Many to One - Unidirectional</h2>
+<pre class="brush:groovy;">
+class Customer {
+	Address address
+}
+class Address {
+}	
+
+def address = new Address()
+address.save()
+customer.address = address
+customer.save()
+
+address.delete()
+//FK constraint exception
+
+customer.delete()
+address.delete()
+//OK
+</pre>
+<ul>
+  <li>Deletes do not cascade</li>
+</ul>
+</div><div class="slide"><h2>Many to One - Bidirectional</h2>
+<pre class="brush:groovy; highlight:[5]">
+class Customer {
+	Address address
+}
+class Address {
+	static belongsTo = [customer:Customer]
+}
+</pre>
+<ul>
+  <li>Address belongs to Customer</li>
+  <li>Saves and Deletes to Customer will cascade to Address</li>
+</ul>
+<pre class="brush:groovy;">
+customer.address = new Address()
+customer.save()
+//OK
+//saves both customer and address
+ customer.delete()
+//OK
+//deletes customer and address	
+</pre>
+</div><div class="slide"><h2>One to Many</h2><p><img src="images/oneToMany.png"  alt="one to many"/></p>
+<ul>
+  <li>use "static hasMany = ..." definition</li>
+  <li>inserts and updates are cascaded</li>
+  <li>deletes cascade if belongsTo is defined</li>
+</ul>
+</div><div class="slide"><h2>One to Many</h2><p><img src="images/oneToMany.png"  alt="one to many"/></p>
+<ul>
+  <li>default is java.util.Set; can use
+  <ul>
+    <li>SortedSet (must implement comparable)</li>
+    <li>List (adds {table}_idx column)</li>
+  </ul></li>
+  <li>convenience methods:
+  <ul>
+    <li>customer.addToIncidents(incident)</li>
+    <li>customer.removeFromIncidents(incident)</li>
+  </ul></li>
+</ul>
+</div><div class="slide"><h2>One to Many</h2><p><img src="images/oneToMany.png"  alt="one to many"/></p>
+<pre class="brush:groovy;">
+class Customer { 
+	static hasMany = [incidents:Incident]
+}
+
+class Incident {
+    static belongsTo = [customer:Customer]
+} 
+
+//saves both Customer and Incident
+def c = new Customer()
+c.addToIncidents(new Incident())
+c.save()
+
+//deletes customer and all associated incidents
+c.delete()	
+</pre>
+</div><div class="slide"><h2>Many to Many</h2><p><img src="images/manyToMany.png"  alt="many to many"/></p>
+<ul>
+  <li>both sides define hasMany</li>
+  <li>must define an owner (using belongsTo on the owned object)</li>
+</ul>
+</div><div class="slide"><h2>Many to Many</h2><p><img src="images/manyToMany.png"  alt="many to many"/></p>
+<pre class="brush:groovy;">
+class Customer { 
+	static hasMany = [products:Product]
+}
+
+class Product { 
+    static hasMany = [customers:Customer]
+	//Customer owns the relationship
+    static belongsTo = Customer 
+	//inserts will cascade from customer not from product
+}
+</pre>
+</div><div class="slide"><h2>Many to Many</h2>
+<ul>
+  <li>Realistically, there is often a concrete entity between the two sides of the relationship</li>
+</ul>
+<pre class="brush:groovy;">
+class Customer { 
+	static hasMany = [products:CustomerProduct]
+}
+
+class CustomerProduct {
+	Customer customer
+	Product product
+	Date datePurchased
+	static belongsTo = [Customer, Product]
+}
+
+class Product { 
+    static hasMany = [customers:CustomerProduct]
+}
+</pre>
+</div>
+
+<a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+<a href="#" class="deck-next-link" title="Next">&#8594;</a>
+
+<p class="deck-status">
+	<span class="deck-status-current"></span>
+	/
+	<span class="deck-status-total"></span>
+</p>
+
+<form action="." method="get" class="goto-form">
+	<label for="goto-slide">Go to slide:</label>
+	<input type="text" name="slidenum" id="goto-slide" list="goto-datalist">
+	<datalist id="goto-datalist"></datalist>
+	<input type="submit" value="Go">
+</form>
+
+<a href="." title="Permalink to this slide" class="deck-permalink">#</a>
+
+
+<script src="../deck.js/jquery-1.7.min.js"></script>
+
+<!-- Deck Core and extensions -->
+<script src="../deck.js/core/deck.core.js"></script>
+<script src="../deck.js/extensions/hash/deck.hash.js"></script>
+<script src="../deck.js/extensions/menu/deck.menu.js"></script>
+<script src="../deck.js/extensions/goto/deck.goto.js"></script>
+<script src="../deck.js/extensions/status/deck.status.js"></script>
+<script src="../deck.js/extensions/navigation/deck.navigation.js"></script>
+
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushPlain.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushGroovy.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushSql.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+
+<script src="../deck.js.custom/init.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	SyntaxHighlighter.defaults['toolbar'] = false;
+    SyntaxHighlighter.all()
+</script>
+
+</body>
+</html>
