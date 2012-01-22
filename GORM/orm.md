@@ -792,7 +792,7 @@ customer.save()
 </pre>
 
 ---
-
+ 
 # One to Many
 
 ![one to many](images/oneToMany.png "One To Many")
@@ -818,7 +818,7 @@ customer.save()
 
 # One to Many
 
-![one to many](oneToMany.png "One To Many")
+![one to many](images/oneToMany.png "One To Many")
 
 <pre class="brush:groovy;">
 class Customer { 

@@ -1,11 +1,11 @@
-#￼Advanced GORM
+# Advanced GORM
      
 - Dynamic finders
 - Hibernate Query Language (HQL) 
 - Criteria Builder
-- Named Queries
 - Where Queries
-- Events / Automatic timestamping Caching
+- Named Queries
+- Events / Automatic timestamping 
 
 ---
 
@@ -40,7 +40,8 @@
 
 --- 
 
-#￼Meta Programming
+# meta programming
+
 
 --- 
 
@@ -48,158 +49,191 @@
 
 ---
 
-￼class Person {
-    String name
-    Integer age
-}
-Person.findByName('Mike')
-￼metaClass
-￼def fakeDb = [new Person(name:'Mike', gender:'M'),
-    new Person(name:'Robin', gender:'F')]
+<pre class="brush:groovy; highlight:[]; class-name:doubleline">
+	class Person {
+	    String name
+	    Integer age
+	}
+	Person.findByName('Mike')
+</pre>
+ 
+---
+
+# metaClass
+
+---
+
+<pre class="brush:groovy; highlight:[];">
+def fakeDb = [new Person(name:'Mike', gender:'M'),
+	new Person(name:'Robin', gender:'F')]
+
 class Person {
     String name
     String gender
     String toString() {name}
 }
-// define a metaClass method on Person Person.metaClass.static.findByName = { String name->
+
+// define a metaClass method on Person
+Person.metaClass.static.findByName = { String name->
     return fakeDb.findAll {it.name == name}
 }
+
 Person.findByName('Robin')
+</pre>
+
 
 ---
 
-#￼invokeMethod
+# invokeMethod
 
 ---
-￼
+
+<pre class="brush:groovy; highlight:[5,6,7,8,9,10]; class-name:doubleline">
+	class AddressBook {
+	   def people = [new Person(name:'Mike', gender:'M'),
+	       new Person(name:'Robin', gender:'F')]
+
+	   def invokeMethod(String name, args) {
+	        def propToFind = name - 'findBy'
+	        people.findAll {
+	            it[propToFind.toLowerCase()] == args[0]
+	        }
+		}
+	}
+	
+	def ab = new AddressBook() 
+	ab.findByName('Robin') 
+	ab.findByGender('F')
+</pre>
+
+---
+
+# methodMissing
+
+---
+
+<pre class="brush:groovy; highlight:[5,6]; class-name:doubleline">
 class AddressBook {
-   def people = [new Person(name:'Mike', gender:'M'),
-       new Person(name:'Robin', gender:'F')]
-   def invokeMethod(String name, args) {
-        def propToFind = name - 'findBy'
-        people.findAll {
-            it[propToFind.toLowerCase()] == args[0]
-        }
+	static people = [new Person(name:'Mike', gender:'M'),
+		new Person(name:'Robin', gender:'F')]
+
+	// intercept
+	def methodMissing(String name, args) {
+		println 'inside methodMissing'
+		def impl = { Object[] theArgs ->
+			def propToFind = name - 'findBy'
+			people.findAll {
+				it[propToFind.toLowerCase()] == args[0]
+			}
+		}
+		// cache
+		AddressBook.metaClass."${name}" = impl
+		// invoke
+		return impl(args)
+	}
 }
-}
-def ab = new AddressBook() ab.findByName('Robin') ab.findByGender('F')
-
----
-
-#￼methodMissing
-
----
-
-class AddressBook {
-    static people = [new Person(name:'Mike', gender:'M'),
-       new Person(name:'Robin', gender:'F')]
-    def methodMissing(String name, args) {
-} }
-println 'inside methodMissing'
-def impl = { Object[] theArgs ->
-    def propToFind = name - 'findBy'
-    people.findAll {
-        it[propToFind.toLowerCase()] == args[0]
-    }
-}
-AddressBook.metaClass."${name}" = impl
-return impl(args)
 def ab = new AddressBook()
 ab.findByName('Robin')
-
----
-
-￼class AddressBook {
-    static people = [new Person(name:'Mike', gender:'M'),
-       new Person(name:'Robin', gender:'F')]
-    def methodMissing(String name, args) {
-println 'inside methodMissing'
-def impl = { Object[] theArgs ->
-    def propToFind = name - 'findBy'
-    people.findAll {
-        it[propToFind.toLowerCase()] == args[0]
-    }
-}
-AddressBook.metaClass."${name}" = impl
-return impl(args)
-￼￼} }
-def ab = new AddressBook()
-ab.findByName('Robin')
+</pre>
 
 intercept
 
 ---
 
-￼class AddressBook {
-    static people = [new Person(name:'Mike', gender:'M'),
-       new Person(name:'Robin', gender:'F')]
-    def methodMissing(String name, args) {
-        println 'inside methodMissing'
-        def impl = { Object[] theArgs ->
-            def propToFind = name - 'findBy'
-            people.findAll {
-                it[propToFind.toLowerCase()] == args[0]
-            }
+<pre class="brush:groovy; highlight:[14,15]; class-name:doubleline">
+class AddressBook {
+	static people = [new Person(name:'Mike', gender:'M'),
+		new Person(name:'Robin', gender:'F')]
+
+	// intercept
+	def methodMissing(String name, args) {
+		println 'inside methodMissing'
+		def impl = { Object[] theArgs ->
+			def propToFind = name - 'findBy'
+			people.findAll {
+				it[propToFind.toLowerCase()] == args[0]
+			}
+		}
+		// cache
+		AddressBook.metaClass."${name}" = impl
+		// invoke
+		return impl(args)
+	}
 }
-        AddressBook.metaClass."${name}" = impl
-￼        return impl(args)
-    }
-}
-def ab = new AddressBook() ab.findByName('Robin')
+def ab = new AddressBook()
+ab.findByName('Robin')
+</pre>
 
 cache
 
 ---
 
-￼class AddressBook {
-    static people = [new Person(name:'Mike', gender:'M'),
-       new Person(name:'Robin', gender:'F')]
-    def methodMissing(String name, args) {
-        println 'inside methodMissing'
-        def impl = { Object[] theArgs ->
-            def propToFind = name - 'findBy'
-            people.findAll {
-                it[propToFind.toLowerCase()] == args[0]
-            }
+<pre class="brush:groovy; highlight:[16,17]; class-name:doubleline">
+class AddressBook {
+	static people = [new Person(name:'Mike', gender:'M'),
+		new Person(name:'Robin', gender:'F')]
+
+	// intercept
+	def methodMissing(String name, args) {
+		println 'inside methodMissing'
+		def impl = { Object[] theArgs ->
+			def propToFind = name - 'findBy'
+			people.findAll {
+				it[propToFind.toLowerCase()] == args[0]
+			}
+		}
+		// cache
+		AddressBook.metaClass."${name}" = impl
+		// invoke
+		return impl(args)
+	}
 }
-        AddressBook.metaClass."${name}" = impl
-return impl(args)
-￼￼} }
-invoke
 def ab = new AddressBook()
 ab.findByName('Robin')
+</pre>
+
+invoke
 
 ---
 
--￼First Time
-	- ab.findByName(‘Robin’)
-	- invokeMethod
-	- methodMissing
-	- method cached
-	- method invoked
+# summary
+
+----
+
++ First Time
+    * ab.findByName('Robin')
+    + invokeMethod
+    - methodMissing
+    - method cached
+    - method invokved
 
 - Second Time
-	- ab.findByName(‘Robin’)
+	- ab.findByName('Robin')
 	- invokeMethod
 	- method invoked
 
 ---
  
-Problem
- 
+# Problem
+
 - Something more advanced than a dynamic finder
 - Dynamic finders are great, but can lead to programmer laziness and performance issues
 - example, find all customers with gold service level and more than 5 incidents
 
 ---
 
+<pre class="brush:groovy; highlight:[]; class-name:doubleline">
+
 def gold = ServiceLevel.findByName('Gold')
 List goldCustomers = Customer.findAllByServiceLevel(gold)
 List moreThanFive = goldCustomers.findAll { cust->
     cust.incidents.size() > 5
 }
+</pre>
 
 ---
+
+<pre class="brush:groovy; highlight:[]; class-name:doubleline">
 
 select
 from service_level where name = ?
@@ -214,16 +248,17 @@ from incident
 where customer_id = ?
 (for each customer)
 iterates through list of customers
+</pre>
 
----
-￼ 
+----------
+
 # HQL
 - Hibernate Query Language
 - SQL-like query language using domain names rather than DB names
 
 ---
 
-#￼HQL
+# HQL
 Customer.findAll(
 ! "from Customer as c where c.name = 'Mike'")
 Customer.findAll(
@@ -243,7 +278,7 @@ Customer.findAll(
 
 ---
 
-#￼find / findAll
+# find / findAll
  
 - find: returns a single object (first found)
 - findAll: returns a list of objects
@@ -261,7 +296,7 @@ properties
 
 ---
 
-#￼executeQuery
+# executeQuery
 
 - doesn’t return a domain class 
 - good for getting a subset of data
@@ -279,7 +314,7 @@ Returns a list of results, where each result is a list itself, e.g.:
 
 ---
 
-#￼executeUpdate
+# executeUpdate
 
 - Data Manipulation
 	- UPDATE
@@ -300,7 +335,7 @@ named parameters
 
 ---
 
-#￼Criteria
+# Criteria
 
 - Grails provides a Hibernate Criteria Builder
 - Useful for forming dynamic queries 
@@ -310,7 +345,7 @@ named parameters
 
 ---
 
-#￼restrictions
+# restrictions
       
 - `eq` - equal
 - `ilike` - case insensitive like (wildcard: %) like - case sensitive like (wildcard: %)
@@ -321,7 +356,7 @@ named parameters
 
 ---
 
-#￼query methods
+# query methods
 
 - list - (default) returns all matching rows 
 - listDistinct - return a distinct set of results 
@@ -330,7 +365,7 @@ named parameters
 
 ---
 
-#￼Criteria
+# Criteria
 ==
 ￼Customer.withCriteria {
     eq('name', 'mike')
@@ -363,7 +398,7 @@ def customerByName(nameToFind) {
 
 ---
 
-#￼Example
+# Example
  
 - simple: find all customers by name
 - find all customers with gold service level and more than 5 incidents
@@ -420,12 +455,12 @@ null
         countDistinct('serviceLevel')
 } }
 println result
-// yields:
+// yields: 
 3
 
 ---
 
-#￼Named Queries
+# Named Queries
  
 - Since Grails 1.2 http://grails.org/doc/latest/ref/Domain %20Classes/namedQueries.html
 - Allow you to define criteria queries as part of the domain class
@@ -434,7 +469,7 @@ println result
 
 ---
 
-#￼Auto Timestamping
+# Auto Timestamping
 
 - Two special properties for domain classes
 	- dateCreated
@@ -455,106 +490,4 @@ println result
 - afterDelete - Executed after an object has been deleted 
 - onLoad - Executed when an object is loaded from the database
 
----
 
-#￼Caching
-  
-- Domain objects
-- Queries
-- Overriding default cache settings
-
----
-
-# Hibernate Cache
-  
-- Hibernate provides a second level cache for domain objects
-- Good for “read mostly” or “read only” type of objects
-- Different Cache Providers:
-	- EHCache (default in Grails)
-	- OSCache
-	- SwarmCache
-	- JBoss Cache
-   
----
-
-#￼Cache Strategies
-- Transactional
-	- (JTA environment only)
-- Read-write
-	- read committed
-- Nonstrict-read-write
-	- occasional updates
-	- unlikely that two transactions update same item simultaneously
-- Read-only
-
----
-
-#￼equals / hashCode
-
-- Define equality using “business key” - NOT primary key of object (exclude collections) 
-- Needed for anything stored in a set or 2nd level cache
-- Can use Intellij to generate
-	- Code > Generate... > equals and hashCode
-- Or implement a framework like :
-	- http://burtbeckwith.com/blog/?p=53
-- Or use Groovy @Equals and @HashCode annotations
-
-
----
-
-#￼Caching in Grails  
-
-- in DataSource.groovy
-hibernate {
-cache.use_second_level_cache=true
-cache.use_query_cache=true cache.provider_class='net.sf.ehcache.hibernate.EhCacheProvider'
-}
-
-- In domain class
-static mapping = {
-    cache true
-}
-
----
-
-#￼Query Caching
-
-- Requires that the domain objects being returned have caching turned on
-- Can be done for queries written with
-	- Criteria
-	- Dynamic Finders
-	- where queries????? TODO
-- Any save of a domain class will clear the query cache
-- Not as useful as you might expect
-- Do your own performance testing!
-
----
-
-#￼Criteria
-def customerByName(nameToFind) {
-    def c = Customer.createCriteria()
-    return c.list() {
-} }
-eq('name', nameToFind)
-cache (true)
-
---- 
-
-#￼Dynamic Finder
-def customerByName(nameToFind) {
-   Customer.findAllByName(nameToFind,
-}
-[cache:true])
-
---- 
-
-#￼Where Query
-
-TODO
-
---- 
-
-# Clearing Cache
- 
-- sessionFactory.evictQueries()
-- sessionFactory.evict(DomainClass.class)
