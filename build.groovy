@@ -6,7 +6,7 @@ import groovy.text.SimpleTemplateEngine
 File targetDir = new File('target')
 targetDir.mkdir()
 
-boolean continuousBuild = true
+boolean continuousBuild = false
 
 if (continuousBuild){
 	def start = new Date().time
@@ -20,6 +20,8 @@ if (continuousBuild){
 				start = files[sourceFile]
 			}
 		}
+		
+		if (files){copyDeckJsResources(targetDir)}
 	}
 } else {
 	def files = findSourceFiles()
@@ -27,8 +29,18 @@ if (continuousBuild){
 	files.keySet().each { File sourceFile ->
 		generateHtmlSlides(sourceFile, targetDir)
 	}
+
+	copyDeckJsResources(targetDir)	
 }
 
+void copyDeckJsResources(targetDir){
+	new AntBuilder().copy( todir:"${targetDir.absolutePath}/deck.js" ) {
+	  fileset( dir:'deck.js')
+	}	
+	new AntBuilder().copy( todir:"${targetDir.absolutePath}/deck.js.custom" ) {
+	  fileset( dir:'deck.js.custom')
+	}	
+}
 
 void generateHtmlSlides(File sourceFile, File targetDir){
 	println "generating slides for ${sourceFile.name} at ${new Date()}"
