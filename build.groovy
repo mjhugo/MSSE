@@ -1,10 +1,12 @@
 @Grab(group='org.pegdown', module='pegdown', version='1.1.0') 
 
+import groovy.text.SimpleTemplateEngine
+
 
 File targetDir = new File('target')
 targetDir.mkdir()
 
-boolean continuousBuild = true
+boolean continuousBuild = false
 
 if (continuousBuild){
 	def start = new Date().time
@@ -33,23 +35,17 @@ void generateHtmlSlides(File sourceFile, File targetDir){
 	String fileBaseName = sourceFile.name - '.md'
 	File parentDirectory = sourceFile.parentFile
 
-new File("${fileBaseName}-pegdown.html").text = new org.pegdown.PegDownProcessor().markdownToHtml(sourceFile.text)
+	String html = new org.pegdown.PegDownProcessor().markdownToHtml(sourceFile.text).replaceAll('<hr/>','</div><div class="slide">')
+
+ 	Map binding = [slides:html, title:parentDirectory.name]
 
 	new File("target/${parentDirectory.name}").mkdirs()
-	
-    String command = "landslide ${sourceFile.name} -d ../target/${parentDirectory.name}/${fileBaseName}.html --relative --copy-theme -t ../landslide/mssetheme/ "
-	println command
 
-    def proc = command.execute(null, parentDirectory)
-    proc.waitFor()
-    if (proc.err.text) {println "ERROR:\n ${proc.err.text}"}
-    println proc.in.text
+	String templateText = new File('deck.js.template.html').text
 
 	File outputFile = new File("target/${parentDirectory.name}/${fileBaseName}.html")
-	outputFile.text = outputFile.text.replaceAll('theme/', '../theme/')
-
-	new File(parentDirectory, 'theme').renameTo(new File(targetDir, "theme"));
-
+	outputFile.text =new SimpleTemplateEngine().createTemplate(templateText).make(binding).toString()
+	
 	parentDirectory.eachFile {supportFile ->
 		if (supportFile.isDirectory() && supportFile.name == 'images'){
 			File targetSupportDir = new File("target/${parentDirectory.name}/${supportFile.name}")
