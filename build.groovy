@@ -6,7 +6,7 @@ import groovy.text.SimpleTemplateEngine
 File targetDir = new File('target')
 targetDir.mkdir()
 
-boolean continuousBuild = false
+boolean continuousBuild = true
 
 if (continuousBuild){
 	def start = new Date().time

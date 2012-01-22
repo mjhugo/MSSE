@@ -2,7 +2,7 @@
 
 ---
 
-# Object Relational Mapping in Grails
+## Object Relational Mapping in Grails
 
 - Grails Object Relational Mapping
 - CRUD
@@ -15,28 +15,28 @@
 
 ---
 
-# Domain Class Location Convention
+## Domain Class Location Convention
 
 <pre class="brush: text; highlight:[6]">
-	├── grails-app
-	│   ├── conf
-	│   │   ├── hibernate
-	│   │   ├── spring
-	│   ├── controllers
-	│   ├── domain
-	│   ├── i18n
-	│   ├── services
-	│   ├── taglib
-	│   ├── utils
-	│   └── views
+	|____grails-app
+	| |____conf
+	| | |____hibernate
+	| | |____spring
+	| |____controllers
+	| |____domain
+	| |____i18n
+	| |____services
+	| |____taglib
+	| |____utils
+	| |____views
 </pre>	
 
 The **domain** subdirectory is for any class that you want to be persistent.
 These classes are automatically mapped to the DB through Hibernate (or other GORM implementation)
 
----
+----
 
-# Database Creation Magic
+## Database Creation Magic
 
 <pre class="brush: groovy; highlight:[11]">
 	dataSource {
@@ -59,7 +59,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 	
 ----------
 
-# DB creation options 
+## DB creation options 
 
 - create-drop
 	- Drop and re-create the database when Grails is run
@@ -72,7 +72,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 	
 ---------------
 
-# DB Console 
+## DB Console 
 
 * grails run-app
 * browse to http://localhost:8080/dbconsole
@@ -185,14 +185,14 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 --------
 
-# ID and Version - invisible attributes?
+## ID and Version - invisible attributes?
 
 - ID and Version were added to the DB table for Customer
 - Where did they come from?
 
 --------
 
-# javap
+## javap
 
 <pre class="brush: text; highlight:[7,8]">
 	javap Customer
@@ -217,7 +217,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 --------
 
-# CRUD
+## CRUD
 
 - Four basic functions of persistent storage:
 	- CREATE - `INSERT`
@@ -227,7 +227,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 ---
 
-# SQL Logging
+## SQL Logging
 
 - turn on SQL logging with `logSql = true` in `grails-app/conf/DataSource.groovy`
 
@@ -242,7 +242,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 	
 ---
 
-# Create
+## Create
 
 <pre class="brush: java; highlight:[4]">
     void testCreate() {
@@ -265,7 +265,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 ---
 
-# Read
+## Read
 
 <pre class="brush: java; highlight:[2,5]">
     void testRead() {
@@ -291,7 +291,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 ---
 
-# Update
+## Update
 <pre class="brush: java; highlight:[8]">
 void testUpdate() {
     //setup
@@ -318,7 +318,7 @@ void testUpdate() {
 
 ---
 
-# Implicit Update
+## Implicit Update
 
 <pre class="brush: java; highlight:[15, 16, 17]">
 void testUpdateImplicit() {
@@ -343,7 +343,7 @@ void testUpdateImplicit() {
 
 ---
 
-# Delete
+## Delete
 <pre class="brush: java; highlight:[7]">
 void testDelete() {
     //setup
@@ -361,7 +361,7 @@ delete from customer where id=? and version=?
 
 ---
 
-# Locking
+## Locking
 
 ![Optimistic Locking illustrated](images/optimisticPessimistic.jpg "http://www.toadworld.com/Portals/0/GuyH/Contention/Feb2008/optimisticPessimistic.jpg")
 
@@ -370,7 +370,7 @@ delete from customer where id=? and version=?
  
 ---
 
-# Optimistic Locking (Default)
+## Optimistic Locking (Default)
 
 - Version column 
 
@@ -393,7 +393,7 @@ delete from customer where id=? and version=?
 
 ---
 
-# Pessimistic Locking
+## Pessimistic Locking
 <pre class="brush: java; highlight:[7]">
 void testLock() {
 	//setup
@@ -413,7 +413,7 @@ void testLock() {
 
 ---
 
-# Constraints and Validation
+## Constraints and Validation
 
 - By default, all properties are required (i.e. can’t be NULL)
 
@@ -436,7 +436,7 @@ Field error in object 'Customer' on field 'name':
 
 ---
 
-# Constraints closure
+## Constraints closure
 
 - By default, all properties are required (i.e. can’t be NULL)
 
@@ -460,7 +460,7 @@ class Customer {
 
 ---
 
-# Built In Constraints
+## Built In Constraints
 
 - `blank` - cannot be empty string
 - `creditCard` - matches a credit card number
@@ -474,7 +474,7 @@ class Customer {
 
 ---
 
-# Built In Constraints
+## Built In Constraints
 
 - `nullable` - set to false for NOT NULL constraint
 - `range` - within a min and max
@@ -486,7 +486,7 @@ class Customer {
 
 ---
 
-# Some constraints influence schema 
+## Some constraints influence schema 
 
 <pre class="brush: groovy;">
 String name
@@ -633,7 +633,7 @@ date_created gets default not nullable
 
 ---
 
-# Validation
+## Validation
 
 - validation is implicitly called when .save() is called, but can also be called independently:
 
@@ -655,7 +655,7 @@ true
 
 ---
 
-# Validation
+## Validation
 
 - Note that by default .save() does not throw an exception if validation fails and entity is NOT persisted
 
@@ -678,7 +678,7 @@ mysql> select count (*) from customer;
 
 ---
 
-# Validation
+## Validation
 
 - Can be overridden by using “failOnError:true” in the .save() call
 
@@ -702,7 +702,7 @@ grails.validation.ValidationException:
 
 ---
 
-# Many to One - Unidirectional
+## Many to One - Unidirectional
 
 <pre class="brush:groovy;">
 class Customer {
@@ -717,7 +717,7 @@ class Address {
 
 ---
 
-# Many to One - Unidirectional
+## Many to One - Unidirectional
 
 <pre class="brush:groovy;">
 class Customer {
@@ -741,7 +741,7 @@ customer.save()
 
 ---
 
-# Many to One - Unidirectional
+## Many to One - Unidirectional
 
 <pre class="brush:groovy;">
 class Customer {
@@ -767,7 +767,7 @@ address.delete()
 
 ---
 
-# Many to One - Bidirectional
+## Many to One - Bidirectional
 
 <pre class="brush:groovy; highlight:[5]">
 class Customer {
@@ -793,7 +793,7 @@ customer.save()
 
 ---
  
-# One to Many
+## One to Many
 
 ![one to many](images/oneToMany.png "One To Many")
 
@@ -803,7 +803,7 @@ customer.save()
 	
 ---
 
-# One to Many
+## One to Many
 
 ![one to many](images/oneToMany.png "One To Many")
 
@@ -816,7 +816,7 @@ customer.save()
 	
 ---
 
-# One to Many
+## One to Many
 
 ![one to many](images/oneToMany.png "One To Many")
 
@@ -840,7 +840,7 @@ c.delete()
 
 ---
 
-# Many to Many
+## Many to Many
 
 ![many to many](images/manyToMany.png "Many To Many")
 
@@ -849,7 +849,7 @@ c.delete()
 
 ---
 
-# Many to Many
+## Many to Many
 
 ![many to many](images/manyToMany.png "Many To Many")
 
@@ -868,7 +868,7 @@ class Product {
 
 ---
 
-# Many to Many
+## Many to Many
 
 - Realistically, there is often a concrete entity between the two sides of the relationship
 
