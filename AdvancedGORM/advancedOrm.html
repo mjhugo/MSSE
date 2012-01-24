@@ -21,13 +21,13 @@
 	<link rel="stylesheet" href="../deck.js/extensions/status/deck.status.css">
 	<link rel="stylesheet" href="../deck.js/extensions/hash/deck.hash.css">
 	
-	<!-- Theme CSS files (menu swaps these out) -->
-	<link rel="stylesheet" id="style-theme-link" href="../deck.js/themes/style/swiss.css">
-	<link rel="stylesheet" id="style-theme-link" href="../deck.js.custom/themes/style/msse.css">
-	<link rel="stylesheet" id="transition-theme-link" href="../deck.js/themes/transition/horizontal-slide.css">
-
 	<link href="../deck.js.custom/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
 	<link href="../deck.js.custom/syntaxhighlighter/styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
+
+	<link rel="stylesheet" id="style-theme-link" href="../deck.js/themes/style/swiss.css">
+	<link rel="stylesheet" id="style-theme-link" href="../deck.js.custom/themes/style/msse.css">
+
+	<link rel="stylesheet" id="transition-theme-link" href="../deck.js/themes/transition/horizontal-slide.css">
 
 	<script src="../deck.js/modernizr.custom.js"></script>
 </head>
@@ -35,6 +35,7 @@
 <body class="deck-container">
 <div class="slide">
 <h1>Advanced GORM</h1>
+</div><div class="slide"><h2>Advanced GORM</h2>
 <ul>
   <li>Dynamic finders</li>
   <li>Hibernate Query Language (HQL)</li>
@@ -44,12 +45,13 @@
   <li>Events / Automatic timestamping</li>
 </ul>
 </div><div class="slide"><h1>Dynamic Finders</h1>
+</div><div class="slide"><h2>Dynamic Finders</h2>
 <ul>
   <li>Synthesized at runtime (not compiled)</li>
   <li>Made of up to two properties, boolean operators and comparators</li>
   <li>Additional parameters can be passed for pagination and sorting</li>
 </ul>
-</div><div class="slide"><h1>Dynamic Finders</h1>
+</div><div class="slide"><h2>Dynamic Finders</h2>
 <ul>
   <li>findAllBy
   <ul>
@@ -60,33 +62,40 @@
     <li>returns single object</li>
   </ul></li>
 </ul>
-</div><div class="slide"><h1>Dynamic Finders</h1>
-<pre class="brush:groovy; highlight:[]; class-name:doubleline">
-	findByName('mike')
-	findAllByName('mike')
-	findAllByNameAndAccountNumber('mike', '123')
-	findAllByNameOrAccountNumber('mike', '789')
-	findAllByNameLike('J%')
-	findAllByNameIlike('j%', [sort:'name'])
-	findAllByNameIlike('j%', [order:'desc',sort:'name'])
-	findAllByNameIlike('j%', 
-		[order:'desc', sort:'name', max:10, offset:0])
+</div><div class="slide"><h2>Dynamic Finders</h2>
+<pre class="brush:groovy; highlight:[];">
+    findByName('mike')
+    findAllByName('mike')
+    findAllByNameAndAccountNumber('mike', '123')
+    findAllByNameOrAccountNumber('mike', '789')
+    findAllByNameLike('J%')
+
+    findAllByNameIlike('j%', 
+        [sort:'name'])
+
+    findAllByNameIlike('j%', 
+        [order:'desc',sort:'name'])
+
+    findAllByNameIlike('j%', 
+        [order:'desc', sort:'name', 
+        max:10, offset:0])
 </pre>
 </div><div class="slide"><h1>meta programming</h1>
 </div><div class="slide"><h1>modify runtime behavior</h1>
 </div><div class="slide">
-<pre class="brush:groovy; highlight:[]; class-name:doubleline">
-	class Person {
-	    String name
-	    Integer age
-	}
-	Person.findByName('Mike')
+<pre class="brush:groovy; highlight:[];">
+    class Person {
+        String name
+        Integer age
+    }
+    Person.findByName('Mike')
 </pre>
 </div><div class="slide"><h1>metaClass</h1>
 </div><div class="slide">
 <pre class="brush:groovy; highlight:[];">
-def fakeDb = [new Person(name:'Mike', gender:'M'),
-	new Person(name:'Robin', gender:'F')]
+def fakeDb = [
+    new Person(name:'Mike', gender:'M'), 
+    new Person(name:'Robin', gender:'F')]
 
 class Person {
     String name
@@ -95,7 +104,8 @@ class Person {
 }
 
 // define a metaClass method on Person
-Person.metaClass.static.findByName = { String name->
+Person.metaClass.static.findByName = 
+{ String name->
     return fakeDb.findAll {it.name == name}
 }
 
@@ -103,92 +113,96 @@ Person.findByName('Robin')
 </pre>
 </div><div class="slide"><h1>invokeMethod</h1>
 </div><div class="slide">
-<pre class="brush:groovy; highlight:[5,6,7,8,9,10]; class-name:doubleline">
-	class AddressBook {
-	   def people = [new Person(name:'Mike', gender:'M'),
-	       new Person(name:'Robin', gender:'F')]
+<pre class="brush:groovy; highlight:[6,7,8,9,10,11];">
+class AddressBook {
+  def people = [
+    new Person(name:'Mike', gender:'M'),
+    new Person(name:'Robin', gender:'F')]
 
-	   def invokeMethod(String name, args) {
-	        def propToFind = name - 'findBy'
-	        people.findAll {
-	            it[propToFind.toLowerCase()] == args[0]
-	        }
-		}
-	}
-	
-	def ab = new AddressBook() 
-	ab.findByName('Robin') 
-	ab.findByGender('F')
+  def invokeMethod(String name, args) {
+    def propToFind = name - 'findBy'
+    people.findAll {
+      it[propToFind.toLowerCase()] == args[0]
+    }
+  }
+}
+
+def ab = new AddressBook() 
+ab.findByName('Robin') 
+ab.findByGender('F')
 </pre>
 </div><div class="slide"><h1>methodMissing</h1>
 </div><div class="slide">
-<pre class="brush:groovy; highlight:[5,6]; class-name:doubleline">
+<pre class="brush:groovy; highlight:[6,7]; class-name:smaller">
 class AddressBook {
-	static people = [new Person(name:'Mike', gender:'M'),
-		new Person(name:'Robin', gender:'F')]
+  static people = [
+      new Person(name: 'Mike', gender: 'M'),
+      new Person(name: 'Robin', gender: 'F')]
 
-	// intercept
-	def methodMissing(String name, args) {
-		println 'inside methodMissing'
-		def impl = { Object[] theArgs ->
-			def propToFind = name - 'findBy'
-			people.findAll {
-				it[propToFind.toLowerCase()] == args[0]
-			}
-		}
-		// cache
-		AddressBook.metaClass."${name}" = impl
-		// invoke
-		return impl(args)
-	}
+  // intercept
+  def methodMissing(String name, args) {
+    println 'inside methodMissing'
+    def impl = { Object[] theArgs ->
+      def propToFind = name - 'findBy'
+      people.findAll {
+        it[propToFind.toLowerCase()] == args[0]
+      }
+    }
+    // cache
+    AddressBook.metaClass."${name}" = impl
+    // invoke
+    return impl(args)
+  }
 }
 def ab = new AddressBook()
 ab.findByName('Robin')
 </pre><p>intercept</p>
 </div><div class="slide">
-<pre class="brush:groovy; highlight:[14,15]; class-name:doubleline">
+<pre class="brush:groovy; highlight:[14,15]; class-name:smaller">
 class AddressBook {
-	static people = [new Person(name:'Mike', gender:'M'),
-		new Person(name:'Robin', gender:'F')]
+  static people = [
+      new Person(name: 'Mike', gender: 'M'),
+      new Person(name: 'Robin', gender: 'F')]
 
-	// intercept
-	def methodMissing(String name, args) {
-		println 'inside methodMissing'
-		def impl = { Object[] theArgs ->
-			def propToFind = name - 'findBy'
-			people.findAll {
-				it[propToFind.toLowerCase()] == args[0]
-			}
-		}
-		// cache
-		AddressBook.metaClass."${name}" = impl
-		// invoke
-		return impl(args)
-	}
+  // intercept
+  def methodMissing(String name, args) {
+    println 'inside methodMissing'
+    def impl = { Object[] theArgs ->
+      def propToFind = name - 'findBy'
+      people.findAll {
+        it[propToFind.toLowerCase()] == args[0]
+      }
+    }
+    // cache
+    AddressBook.metaClass."${name}" = impl
+    // invoke
+    return impl(args)
+  }
 }
 def ab = new AddressBook()
 ab.findByName('Robin')
 </pre><p>cache</p>
 </div><div class="slide">
-<pre class="brush:groovy; highlight:[16,17]; class-name:doubleline">
+<pre class="brush:groovy; highlight:[16,17]; class-name:smaller">
 class AddressBook {
-	static people = [new Person(name:'Mike', gender:'M'),
-		new Person(name:'Robin', gender:'F')]
+  static people = [
+      new Person(name: 'Mike', gender: 'M'),
+      new Person(name: 'Robin', gender: 'F')]
 
-	// intercept
-	def methodMissing(String name, args) {
-		println 'inside methodMissing'
-		def impl = { Object[] theArgs ->
-			def propToFind = name - 'findBy'
-			people.findAll {
-				it[propToFind.toLowerCase()] == args[0]
-			}
-		}
-		// cache
-		AddressBook.metaClass."${name}" = impl
-		// invoke
-		return impl(args)
-	}
+  // intercept
+  def methodMissing(String name, args) {
+    println 'inside methodMissing'
+    def impl = { Object[] theArgs ->
+      def propToFind = name - 'findBy'
+      people.findAll {
+        it[propToFind.toLowerCase()] == args[0]
+      }
+    }
+    // cache
+    AddressBook.metaClass."${name}" = impl
+    // invoke
+    return impl(args)
+  }
 }
 def ab = new AddressBook()
 ab.findByName('Robin')
@@ -211,58 +225,89 @@ ab.findByName('Robin')
     <li>method invoked</li>
   </ul></li>
 </ul>
-</div><div class="slide"><h1>Problem</h1>
+</div><div class="slide"><h2>Problem</h2>
 <ul>
   <li>Something more advanced than a dynamic finder</li>
   <li>Dynamic finders are great, but can lead to programmer laziness and performance issues</li>
-  <li>example, find all customers with gold service level and more than 5 incidents</li>
 </ul>
-</div><div class="slide">
-<pre class="brush:groovy; highlight:[]; class-name:doubleline">
-
+</div><div class="slide"><h2>Example</h2><p>Find all customers with gold service level and more than 5 incidents</p>
+<pre class="brush:groovy; highlight:[];">
 def gold = ServiceLevel.findByName('Gold')
-List goldCustomers = Customer.findAllByServiceLevel(gold)
-List moreThanFive = goldCustomers.findAll { cust->
-    cust.incidents.size() > 5
+
+List goldCustomers = 
+  Customer.findAllByServiceLevel(gold)
+
+List moreThanFive = 
+  goldCustomers.findAll { cust->
+  	cust.incidents.size() > 5
 }
 </pre>
 </div><div class="slide">
-<pre class="brush:groovy; highlight:[]; class-name:doubleline">
+<pre class="brush:groovy; highlight:[];">
+def gold = ServiceLevel.findByName('Gold')
+// select * from service_level where name = ?
 
-select
-from service_level where name = ?
-select from customer where service_level_id = ?
-￼￼def gold = ServiceLevel.findByName('Gold')
-List goldCustomers = Customer.findAllByServiceLevel(gold)
-List moreThanFive = goldCustomers.findAll { cust->
+List goldCustomers =
+  Customer.findAllByServiceLevel(gold)
+// select * from customer where service_level_id = ?
+
+List moreThanFive =
+  goldCustomers.findAll { cust->
+    // iterates through each customer in the list
+
     cust.incidents.size() > 5
+    // select * from incident where customer_id = ?
+    // (for each customer!)
 }
-select
-from incident
-where customer_id = ?
-(for each customer)
-iterates through list of customers
 </pre>
 </div><div class="slide"><h1>HQL</h1>
+</div><div class="slide"><h2>HQL</h2>
 <ul>
   <li>Hibernate Query Language</li>
-  <li>SQL-like query language using domain names rather than DB names</li>
+  <li>SQL-like query language using domain and property names rather than DB names</li>
 </ul>
-</div><div class="slide"><h1>HQL</h1><p>Customer.findAll( ! "from Customer as c where c.name = 'Mike'") Customer.findAll( ! "from Customer as c where c.name = ?", ! ['Mike']) Customer.findAll( ! "from Customer as c where c.name = :name",  [name:'mike'])</p>
-</div><div class="slide"><h1>methods</h1>
+<pre class="brush:groovy; highlight:[];">
+Customer.findAll(
+  "from Customer as c where c.name = 'Mike'")
+
+Customer.findAll(
+  "from Customer as c where c.name = ?", ['Mike'])
+
+Customer.findAll(
+  "from Customer as c where c.name = :name",
+    [name:'mike'])
+</pre>
+</div><div class="slide"><h2>methods</h2>
 <ul>
   <li>find</li>
   <li>findAll</li>
   <li>executeQuery</li>
   <li>executeUpdate</li>
 </ul>
-</div><div class="slide"><h1>find / findAll</h1>
+</div><div class="slide"><h2>find / findAll</h2>
 <ul>
   <li>find: returns a single object (first found)</li>
   <li>findAll: returns a list of objects</li>
 </ul>
-</div><div class="slide"><p>Customer.findAll(  "from Customer as c  inner join fetch c.address  where c.serviceLevel.name = ?  and size(c.incidents) &gt; 5", ￼￼￼￼￼['Gold']) ￼parameter properties</p>
-</div><div class="slide"><h1>executeQuery</h1>
+</div><div class="slide">
+<pre class="brush:text; highlight:[];">
+Customer.findAll(
+  "from Customer as c            
+   inner join fetch c.address    
+   where c.serviceLevel.name = ? 
+   and size(c.incidents) > 5",
+	['Gold'])                   
+
+
+
+Customer.findAll(
+  "from Customer as c            <--- class name
+   inner join fetch c.address    <--- property
+   where c.serviceLevel.name = ? <--- parameter
+   and size(c.incidents) > 5",
+	['Gold'])                    <--- parameter value
+</pre>
+</div><div class="slide"><h2>executeQuery</h2>
 <ul>
   <li>doesn’t return a domain class</li>
   <li>good for getting a subset of data
@@ -271,8 +316,16 @@ iterates through list of customers
     <li>count, min, max, etc</li>
   </ul></li>
 </ul>
-</div><div class="slide"><p>￼Address.executeQuery(  "select distinct state, count(*)  from Address  group by state") Returns a list of results, where each result is a list itself, e.g.: [ [MN, 5], [WI, 10] ]</p>
-</div><div class="slide"><h1>executeUpdate</h1>
+</div><div class="slide">
+<pre class="brush:text; highlight:[];">
+Address.executeQuery(
+	"select distinct state, count(*)
+	from Address
+	group by state")
+</pre><p>Returns a list of results, where each result is a list itself, e.g.:</p>
+<pre><code>[ [MN, 5], [WI, 10] ]
+</code></pre>
+</div><div class="slide"><h2>executeUpdate</h2>
 <ul>
   <li>Data Manipulation
   <ul>
@@ -282,8 +335,20 @@ iterates through list of customers
   <li>e.g. update all silver statuses to platinum</li>
   <li>delete all accounts with no activity in the 90 days</li>
 </ul>
-</div><div class="slide"><p>￼Customer.executeUpdate(  "update Customer c  set c.serviceLevel = :newSl  where c.serviceLevel = :oldSl", [newSl:ServiceLevel.findByName('SuperAwesome'),  oldSl: ServiceLevel.findByName('Gold')]) named parameters named parameters</p>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[];">
+Customer.executeUpdate(
+	'''update Customer c
+   	set c.serviceLevel = :newSl
+   	where c.serviceLevel = :oldSl''',
+	[
+	 newSl:ServiceLevel.findByName('SuperAwesome'),
+ 	 oldSl: ServiceLevel.findByName('Gold')
+	]
+)
+</pre>
 </div><div class="slide"><h1>Criteria</h1>
+</div><div class="slide"><h2>Criteria</h2>
 <ul>
   <li>Grails provides a Hibernate Criteria Builder</li>
   <li>Useful for forming dynamic queries</li>
@@ -293,7 +358,7 @@ iterates through list of customers
     <li>withCriteria - inline criteria builder</li>
   </ul></li>
 </ul>
-</div><div class="slide"><h1>restrictions</h1>
+</div><div class="slide"><h2>restrictions</h2>
 <ul>
   <li><code>eq</code> - equal</li>
   <li><code>ilike</code> - case insensitive like (wildcard: %) like - case sensitive like (wildcard: %)</li>
@@ -302,16 +367,57 @@ iterates through list of customers
   <li><code>lt</code>, <code>le</code> - less than; less than or equal</li>
   <li><code>gt</code>, <code>ge</code> - greater than; greater than or equal</li>
 </ul>
-</div><div class="slide"><h1>query methods</h1>
+</div><div class="slide"><h2>query methods</h2>
 <ul>
   <li>list - (default) returns all matching rows</li>
   <li>listDistinct - return a distinct set of results</li>
   <li>get - retrieve one row (useful for projections)</li>
   <li>scroll - returns a scrollable result set</li>
 </ul>
-</div><div class="slide"><h1>Criteria</h1><p>== ￼Customer.withCriteria {  eq('name', 'mike') } ￼def c = Customer.createCriteria() c{  eq('name', 'mike') } ￼def c = Customer.createCriteria() c{  or {  eq('name', 'mike')  eq('accountNumber', '789') } } == ￼￼findAllByNameOrAccountNumber('mike', '789')</p>
-</div><div class="slide"><p>￼def customerByName(nameToFind) {  def c = Customer.createCriteria()  return c.list() {  eq('name', nameToFind)  } } // same as: def customerByName(nameToFind) {  return Customer.withCriteria {  eq('name', nameToFind)  } }</p>
-</div><div class="slide"><h1>Example</h1>
+</div><div class="slide"><h2>Criteria</h2>
+<pre class="brush:groovy; highlight:[];">
+Customer.withCriteria {
+    eq('name', 'mike')
+}
+
+// is the same as
+
+def c = Customer.createCriteria() 
+c {
+    eq('name', 'mike')
+}
+</pre>
+</div><div class="slide"><h2>Criteria</h2>
+<pre class="brush:groovy; highlight:[];">
+def c = Customer.createCriteria() c{
+    or {
+        eq('name', 'mike')
+        eq('accountNumber', '789')
+	} 
+}
+
+// is the same as
+
+findAllByNameOrAccountNumber('mike', '789')
+</pre>
+</div><div class="slide"><h2>Criteria</h2>
+<pre class="brush:groovy; highlight:[];">
+def customerByName(nameToFind) {
+    def c = Customer.createCriteria()
+    return c.list() {
+        eq('name', nameToFind)
+    }
+}
+
+// is the same as
+
+def customerByName(nameToFind) {
+    return Customer.withCriteria {
+        eq('name', nameToFind)
+    }
+}
+</pre>
+</div><div class="slide"><h2>Example</h2>
 <ul>
   <li>simple: find all customers by name</li>
   <li>find all customers with gold service level and more than 5 incidents</li>
@@ -322,19 +428,82 @@ iterates through list of customers
     <li>state</li>
   </ul></li>
 </ul>
-</div><div class="slide"><p>￼def goldWithFiveCriteria() { def c = Customer.createCriteria() return c.list() {  serviceLevel {  eq('name', 'Gold') }  sizeGt('incidents', 5)  } }</p>
-</div><div class="slide"><p>￼def search(accountNumber, name, state) { def c = Customer.createCriteria() return c.list {  or {  if (accountNumber){  ilike('accountNumber', "${accountNumber}%")  }  if (name){  ilike('name', "${name}%") } }  if (state &amp;&amp; state != 'null'){  address { } } }  eq('state', state) }</p>
-</div><div class="slide"><p>￼def c = Customer.createCriteria() def results = c.scroll() {  address {  eq('state', 'MN') } } results.first() println results.get() results.next() println results.get() results.last() println results.get() results.next() println results.get() // yields: [Victoria Benjamin (5)]
-[Sybill Cline (50)] [Len Small (157)] null</p>
-</div><div class="slide"><p>￼def c = Customer.createCriteria() def result = c.get() {  projections {  countDistinct('serviceLevel') } } println result // yields: 3</p>
-</div><div class="slide"><h1>Named Queries</h1>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[];">
+def goldWithFiveCriteria() {
+	def c = Customer.createCriteria() return c.list() {
+        serviceLevel {
+            eq('name', 'Gold')
+		}
+        sizeGt('incidents', 5)
+    }
+}
+</pre><p>find all customers with gold service level and more than 5 incidents</p>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[];">
+def search(accountNumber, name, state) {
+  def c = Customer.createCriteria()
+  return c.list {
+    or {
+      if (accountNumber) {
+        ilike('accountNumber', "${accountNumber}%")
+      }
+      if (name) {
+        ilike('name', "${name}%")
+      }
+    }
+    if (state) {
+      address {
+        eq('state', state)
+      }
+    }
+  }
+}
+</pre><p>"advanced" search function </p>
+</div><div class="slide"><h1>Where Queries</h1>
+</div><div class="slide"><h2>Where Queries</h2>
 <ul>
-  <li>Since Grails 1.2 http://grails.org/doc/latest/ref/Domain %20Classes/namedQueries.html</li>
+  <li>Define a query using boolean logic</li>
+  <li>Can be combined (not quite like chaining)</li>
+  <li>Can be combined with dynamic finders</li>
+</ul>
+</div><div class="slide"><h2>Where Query</h2>
+<pre class="brush:groovy; highlight:[];">
+Customer.where {
+  	serviceLevel.name == 'Gold' 
+	&& 
+	incidents.size() > 5
+}.list()
+</pre><p>find all customers with gold service level and more than 5 incidents</p>
+</div><div class="slide"><h2>Named Queries</h2>
+<ul>
   <li>Allow you to define criteria queries as part of the domain class</li>
   <li>Can be chained together</li>
-  <li>Can be combined with dynamic finders Break down queries into components</li>
+  <li>Can be combined with dynamic finders</li>
+  <li>Break down queries into components</li>
 </ul>
-</div><div class="slide"><h1>Auto Timestamping</h1>
+</div><div class="slide">
+<pre class="brush:groovy; highlight:[];">
+	class Customer {
+	    //...
+	    static namedQueries = {
+	        goldLevelMoreThanFiveIncidents {
+	            byServiceLevelName('Gold')
+	            moreThanFiveIncidents()
+	        }
+
+	        moreThanFiveIncidents {
+	            sizeGt('incidents', 5)
+	        }
+
+	        byServiceLevelName { serviceLevelName ->
+	            serviceLevel {
+	                eq('name', serviceLevelName)
+	            }
+	        }
+	    }
+</pre>
+</div><div class="slide"><h2>Auto Timestamping</h2>
 <ul>
   <li>Two special properties for domain classes
   <ul>
@@ -344,7 +513,7 @@ iterates through list of customers
   <li>Must be nullable</li>
   <li>Will be set automatically when object is persisted to the database</li>
 </ul>
-</div><div class="slide"><h1>Events</h1>
+</div><div class="slide"><h2>Events</h2>
 <ul>
   <li>beforeInsert - Executed before an object is initially persisted to the database</li>
   <li>beforeUpdate - Executed before an object is updated</li>
@@ -359,6 +528,9 @@ iterates through list of customers
 
 <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
 <a href="#" class="deck-next-link" title="Next">&#8594;</a>
+
+<p class="attribution" style="font-size:0.6em;"><a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/80x15.png" /></a> &nbsp;Mike Hugo, <a href="http://piragua.com">Piragua Consulting, Inc.</a></span>
+</p>
 
 <p class="deck-status">
 	<span class="deck-status-current"></span>
