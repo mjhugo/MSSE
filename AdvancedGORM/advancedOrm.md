@@ -1,4 +1,8 @@
 # Advanced GORM
+
+----
+
+## Advanced GORM
      
 - Dynamic finders
 - Hibernate Query Language (HQL) 
@@ -10,6 +14,10 @@
 ---
 
 # Dynamic Finders
+
+---
+
+## Dynamic Finders
  
 - Synthesized at runtime (not compiled) 
 - Made of up to two properties, boolean operators and comparators
@@ -17,25 +25,31 @@
 
 --- 
 
-# Dynamic Finders
+## Dynamic Finders
 - findAllBy
-	- returns list of objects
+    - returns list of objects
 - findBy
-	- returns single object
+    - returns single object
 
 ---
 
-# Dynamic Finders
-<pre class="brush:groovy; highlight:[]; class-name:doubleline">
-	findByName('mike')
-	findAllByName('mike')
-	findAllByNameAndAccountNumber('mike', '123')
-	findAllByNameOrAccountNumber('mike', '789')
-	findAllByNameLike('J%')
-	findAllByNameIlike('j%', [sort:'name'])
-	findAllByNameIlike('j%', [order:'desc',sort:'name'])
-	findAllByNameIlike('j%', 
-		[order:'desc', sort:'name', max:10, offset:0])
+## Dynamic Finders
+<pre class="brush:groovy; highlight:[];">
+    findByName('mike')
+    findAllByName('mike')
+    findAllByNameAndAccountNumber('mike', '123')
+    findAllByNameOrAccountNumber('mike', '789')
+    findAllByNameLike('J%')
+
+    findAllByNameIlike('j%', 
+        [sort:'name'])
+
+    findAllByNameIlike('j%', 
+        [order:'desc',sort:'name'])
+
+    findAllByNameIlike('j%', 
+        [order:'desc', sort:'name', 
+        max:10, offset:0])
 </pre>
 
 --- 
@@ -49,12 +63,12 @@
 
 ---
 
-<pre class="brush:groovy; highlight:[]; class-name:doubleline">
-	class Person {
-	    String name
-	    Integer age
-	}
-	Person.findByName('Mike')
+<pre class="brush:groovy; highlight:[];">
+    class Person {
+        String name
+        Integer age
+    }
+    Person.findByName('Mike')
 </pre>
  
 ---
@@ -64,8 +78,9 @@
 ---
 
 <pre class="brush:groovy; highlight:[];">
-def fakeDb = [new Person(name:'Mike', gender:'M'),
-	new Person(name:'Robin', gender:'F')]
+def fakeDb = [
+    new Person(name:'Mike', gender:'M'), 
+    new Person(name:'Robin', gender:'F')]
 
 class Person {
     String name
@@ -74,7 +89,8 @@ class Person {
 }
 
 // define a metaClass method on Person
-Person.metaClass.static.findByName = { String name->
+Person.metaClass.static.findByName = 
+{ String name->
     return fakeDb.findAll {it.name == name}
 }
 
@@ -88,22 +104,23 @@ Person.findByName('Robin')
 
 ---
 
-<pre class="brush:groovy; highlight:[5,6,7,8,9,10]; class-name:doubleline">
-	class AddressBook {
-	   def people = [new Person(name:'Mike', gender:'M'),
-	       new Person(name:'Robin', gender:'F')]
+<pre class="brush:groovy; highlight:[6,7,8,9,10,11];">
+class AddressBook {
+  def people = [
+    new Person(name:'Mike', gender:'M'),
+    new Person(name:'Robin', gender:'F')]
 
-	   def invokeMethod(String name, args) {
-	        def propToFind = name - 'findBy'
-	        people.findAll {
-	            it[propToFind.toLowerCase()] == args[0]
-	        }
-		}
-	}
-	
-	def ab = new AddressBook() 
-	ab.findByName('Robin') 
-	ab.findByGender('F')
+  def invokeMethod(String name, args) {
+    def propToFind = name - 'findBy'
+    people.findAll {
+      it[propToFind.toLowerCase()] == args[0]
+    }
+  }
+}
+
+def ab = new AddressBook() 
+ab.findByName('Robin') 
+ab.findByGender('F')
 </pre>
 
 ---
@@ -112,25 +129,26 @@ Person.findByName('Robin')
 
 ---
 
-<pre class="brush:groovy; highlight:[5,6]; class-name:doubleline">
+<pre class="brush:groovy; highlight:[6,7]; class-name:smaller">
 class AddressBook {
-	static people = [new Person(name:'Mike', gender:'M'),
-		new Person(name:'Robin', gender:'F')]
+  static people = [
+      new Person(name: 'Mike', gender: 'M'),
+      new Person(name: 'Robin', gender: 'F')]
 
-	// intercept
-	def methodMissing(String name, args) {
-		println 'inside methodMissing'
-		def impl = { Object[] theArgs ->
-			def propToFind = name - 'findBy'
-			people.findAll {
-				it[propToFind.toLowerCase()] == args[0]
-			}
-		}
-		// cache
-		AddressBook.metaClass."${name}" = impl
-		// invoke
-		return impl(args)
-	}
+  // intercept
+  def methodMissing(String name, args) {
+    println 'inside methodMissing'
+    def impl = { Object[] theArgs ->
+      def propToFind = name - 'findBy'
+      people.findAll {
+        it[propToFind.toLowerCase()] == args[0]
+      }
+    }
+    // cache
+    AddressBook.metaClass."${name}" = impl
+    // invoke
+    return impl(args)
+  }
 }
 def ab = new AddressBook()
 ab.findByName('Robin')
@@ -140,25 +158,26 @@ intercept
 
 ---
 
-<pre class="brush:groovy; highlight:[14,15]; class-name:doubleline">
+<pre class="brush:groovy; highlight:[14,15]; class-name:smaller">
 class AddressBook {
-	static people = [new Person(name:'Mike', gender:'M'),
-		new Person(name:'Robin', gender:'F')]
+  static people = [
+      new Person(name: 'Mike', gender: 'M'),
+      new Person(name: 'Robin', gender: 'F')]
 
-	// intercept
-	def methodMissing(String name, args) {
-		println 'inside methodMissing'
-		def impl = { Object[] theArgs ->
-			def propToFind = name - 'findBy'
-			people.findAll {
-				it[propToFind.toLowerCase()] == args[0]
-			}
-		}
-		// cache
-		AddressBook.metaClass."${name}" = impl
-		// invoke
-		return impl(args)
-	}
+  // intercept
+  def methodMissing(String name, args) {
+    println 'inside methodMissing'
+    def impl = { Object[] theArgs ->
+      def propToFind = name - 'findBy'
+      people.findAll {
+        it[propToFind.toLowerCase()] == args[0]
+      }
+    }
+    // cache
+    AddressBook.metaClass."${name}" = impl
+    // invoke
+    return impl(args)
+  }
 }
 def ab = new AddressBook()
 ab.findByName('Robin')
@@ -168,25 +187,26 @@ cache
 
 ---
 
-<pre class="brush:groovy; highlight:[16,17]; class-name:doubleline">
+<pre class="brush:groovy; highlight:[16,17]; class-name:smaller">
 class AddressBook {
-	static people = [new Person(name:'Mike', gender:'M'),
-		new Person(name:'Robin', gender:'F')]
+  static people = [
+      new Person(name: 'Mike', gender: 'M'),
+      new Person(name: 'Robin', gender: 'F')]
 
-	// intercept
-	def methodMissing(String name, args) {
-		println 'inside methodMissing'
-		def impl = { Object[] theArgs ->
-			def propToFind = name - 'findBy'
-			people.findAll {
-				it[propToFind.toLowerCase()] == args[0]
-			}
-		}
-		// cache
-		AddressBook.metaClass."${name}" = impl
-		// invoke
-		return impl(args)
-	}
+  // intercept
+  def methodMissing(String name, args) {
+    println 'inside methodMissing'
+    def impl = { Object[] theArgs ->
+      def propToFind = name - 'findBy'
+      people.findAll {
+        it[propToFind.toLowerCase()] == args[0]
+      }
+    }
+    // cache
+    AddressBook.metaClass."${name}" = impl
+    // invoke
+    return impl(args)
+  }
 }
 def ab = new AddressBook()
 ab.findByName('Robin')
@@ -200,76 +220,87 @@ invoke
 
 ----
 
-+ First Time
-    * ab.findByName('Robin')
-    + invokeMethod
+- First Time
+    - ab.findByName('Robin')
+    - invokeMethod
     - methodMissing
     - method cached
     - method invokved
 
 - Second Time
-	- ab.findByName('Robin')
-	- invokeMethod
-	- method invoked
+    - ab.findByName('Robin')
+    - invokeMethod
+    - method invoked
 
 ---
- 
-# Problem
+
+## Problem
 
 - Something more advanced than a dynamic finder
 - Dynamic finders are great, but can lead to programmer laziness and performance issues
-- example, find all customers with gold service level and more than 5 incidents
 
 ---
 
-<pre class="brush:groovy; highlight:[]; class-name:doubleline">
+## Example
 
+Find all customers with gold service level and more than 5 incidents
+
+<pre class="brush:groovy; highlight:[];">
 def gold = ServiceLevel.findByName('Gold')
-List goldCustomers = Customer.findAllByServiceLevel(gold)
-List moreThanFive = goldCustomers.findAll { cust->
-    cust.incidents.size() > 5
+
+List goldCustomers = 
+  Customer.findAllByServiceLevel(gold)
+
+List moreThanFive = 
+  goldCustomers.findAll { cust->
+  	cust.incidents.size() > 5
 }
 </pre>
 
 ---
 
-<pre class="brush:groovy; highlight:[]; class-name:doubleline">
+<pre class="brush:groovy; highlight:[];">
+def gold = ServiceLevel.findByName('Gold')
+// select * from service_level where name = ?
 
-select
-from service_level where name = ?
-select from customer where service_level_id = ?
-￼￼def gold = ServiceLevel.findByName('Gold')
-List goldCustomers = Customer.findAllByServiceLevel(gold)
-List moreThanFive = goldCustomers.findAll { cust->
+List goldCustomers =
+  Customer.findAllByServiceLevel(gold)
+// select * from customer where service_level_id = ?
+
+List moreThanFive =
+  goldCustomers.findAll { cust->
+    // iterates through each customer in the list
+
     cust.incidents.size() > 5
+    // select * from incident where customer_id = ?
+    // (for each customer!)
 }
-select
-from incident
-where customer_id = ?
-(for each customer)
-iterates through list of customers
 </pre>
 
 ----------
 
 # HQL
+
+---
+
+## HQL
 - Hibernate Query Language
-- SQL-like query language using domain names rather than DB names
+- SQL-like query language using domain and property names rather than DB names
 
----
+<pre class="brush:groovy; highlight:[];">
+Customer.findAll(
+  "from Customer as c where c.name = 'Mike'")
 
-# HQL
 Customer.findAll(
-! "from Customer as c where c.name = 'Mike'")
+  "from Customer as c where c.name = ?", ['Mike'])
+
 Customer.findAll(
-! "from Customer as c where c.name = ?", ! ['Mike'])
-Customer.findAll(
-! "from Customer as c where c.name = :name",
+  "from Customer as c where c.name = :name",
     [name:'mike'])
-
+</pre>
 ---
 
-# methods
+## methods
  
 - find
 - findAll 
@@ -278,74 +309,94 @@ Customer.findAll(
 
 ---
 
-# find / findAll
+## find / findAll
  
 - find: returns a single object (first found)
 - findAll: returns a list of objects
 
 ---
 
+<pre class="brush:text; highlight:[];">
 Customer.findAll(
-  "from Customer as c
-   inner join fetch c.address
-   where c.serviceLevel.name = ?
+  "from Customer as c            
+   inner join fetch c.address    
+   where c.serviceLevel.name = ? 
    and size(c.incidents) > 5",
-￼￼￼￼￼['Gold'])
-￼parameter
-properties
+	['Gold'])                   
+
+
+
+Customer.findAll(
+  "from Customer as c            <--- class name
+   inner join fetch c.address    <--- property
+   where c.serviceLevel.name = ? <--- parameter
+   and size(c.incidents) > 5",
+	['Gold'])                    <--- parameter value
+</pre>
 
 ---
 
-# executeQuery
+## executeQuery
 
 - doesn’t return a domain class 
 - good for getting a subset of data
-	- loading a single column
-	- count, min, max, etc
+    - loading a single column
+    - count, min, max, etc
 
 ---
 
-￼Address.executeQuery(
-  "select distinct state, count(*)
-  from Address
-  group by state")
+<pre class="brush:text; highlight:[];">
+Address.executeQuery(
+	"select distinct state, count(*)
+	from Address
+	group by state")
+</pre>
+
 Returns a list of results, where each result is a list itself, e.g.:
-[ [MN, 5], [WI, 10] ]
+
+	[ [MN, 5], [WI, 10] ]
+
 
 ---
 
-# executeUpdate
+## executeUpdate
 
 - Data Manipulation
-	- UPDATE
-	- DELETE
+    - UPDATE
+    - DELETE
 - e.g. update all silver statuses to platinum
 - delete all accounts with no activity in the 90 days
 
 ---
 
-￼Customer.executeUpdate(
-  "update Customer c
- set c.serviceLevel = :newSl
- where c.serviceLevel = :oldSl",
-[newSl:ServiceLevel.findByName('SuperAwesome'),
- oldSl: ServiceLevel.findByName('Gold')])
-named parameters
-named parameters
-
+<pre class="brush:groovy; highlight:[];">
+Customer.executeUpdate(
+	'''update Customer c
+   	set c.serviceLevel = :newSl
+   	where c.serviceLevel = :oldSl''',
+	[
+	 newSl:ServiceLevel.findByName('SuperAwesome'),
+ 	 oldSl: ServiceLevel.findByName('Gold')
+	]
+)
+</pre>
 ---
 
 # Criteria
 
+----------
+
+## Criteria
+
 - Grails provides a Hibernate Criteria Builder
 - Useful for forming dynamic queries 
 - Two methods:
-	- createCriteria
-	- withCriteria - inline criteria builder
+    - createCriteria
+    - withCriteria - inline criteria builder
 
 ---
 
-# restrictions
+## restrictions
       
 - `eq` - equal
 - `ilike` - case insensitive like (wildcard: %) like - case sensitive like (wildcard: %)
@@ -356,7 +407,7 @@ named parameters
 
 ---
 
-# query methods
+## query methods
 
 - list - (default) returns all matching rows 
 - listDistinct - return a distinct set of results 
@@ -365,121 +416,181 @@ named parameters
 
 ---
 
-# Criteria
-==
-￼Customer.withCriteria {
+## Criteria
+
+<pre class="brush:groovy; highlight:[];">
+Customer.withCriteria {
     eq('name', 'mike')
 }
-￼def c = Customer.createCriteria() c{
+
+// is the same as
+
+def c = Customer.createCriteria() 
+c {
     eq('name', 'mike')
 }
-￼def c = Customer.createCriteria() c{
-    or {
-        eq('name', 'mike')
-        eq('accountNumber', '789')
-} }
-==
-￼￼findAllByNameOrAccountNumber('mike', '789')
+</pre>
 
 ---
 
-￼def customerByName(nameToFind) {
+## Criteria
+
+<pre class="brush:groovy; highlight:[];">
+def c = Customer.createCriteria() c{
+    or {
+        eq('name', 'mike')
+        eq('accountNumber', '789')
+	} 
+}
+
+// is the same as
+
+findAllByNameOrAccountNumber('mike', '789')
+</pre>
+
+---
+
+## Criteria
+
+<pre class="brush:groovy; highlight:[];">
+def customerByName(nameToFind) {
     def c = Customer.createCriteria()
     return c.list() {
         eq('name', nameToFind)
     }
 }
-// same as:
+
+// is the same as
+
 def customerByName(nameToFind) {
     return Customer.withCriteria {
         eq('name', nameToFind)
     }
 }
-
+</pre>
 ---
 
-# Example
+## Example
  
 - simple: find all customers by name
 - find all customers with gold service level and more than 5 incidents
 - Advanced Search function
-	- name
-	- account number
-	- state
+    - name
+    - account number
+    - state
 
 ---
 
-￼def goldWithFiveCriteria() {
-def c = Customer.createCriteria() return c.list() {
+<pre class="brush:groovy; highlight:[];">
+def goldWithFiveCriteria() {
+	def c = Customer.createCriteria() return c.list() {
         serviceLevel {
             eq('name', 'Gold')
-}
+		}
         sizeGt('incidents', 5)
     }
 }
+</pre>
+
+find all customers with gold service level and more than 5 incidents
+
 
 ---
 
-￼def search(accountNumber, name, state) { def c = Customer.createCriteria() return c.list {
-        or {
-            if (accountNumber){
-                ilike('accountNumber', "${accountNumber}%")
-            }
-            if (name){
-                ilike('name', "${name}%")
-} }
-        if (state && state != 'null'){
-            address {
-} }
+<pre class="brush:groovy; highlight:[];">
+def search(accountNumber, name, state) {
+  def c = Customer.createCriteria()
+  return c.list {
+    or {
+      if (accountNumber) {
+        ilike('accountNumber', "${accountNumber}%")
+      }
+      if (name) {
+        ilike('name', "${name}%")
+      }
+    }
+    if (state) {
+      address {
+        eq('state', state)
+      }
+    }
+  }
 }
-    eq('state', state)
-}
+</pre>
+
+"advanced" search function 
 
 ---
 
-￼def c = Customer.createCriteria() def results = c.scroll() {
-    address {
-        eq('state', 'MN')
-} }
-results.first() println results.get() results.next() println results.get() results.last() println results.get() results.next() println results.get()
-// yields:
-[Victoria Benjamin (5)]
-[Sybill Cline (50)]
-[Len Small (157)]
-null
+# Where Queries
 
 ---
 
-￼def c = Customer.createCriteria() def result = c.get() {
-    projections {
-        countDistinct('serviceLevel')
-} }
-println result
-// yields: 
-3
+## Where Queries
+
+- Define a query using boolean logic
+- Can be combined (not quite like chaining)
+- Can be combined with dynamic finders 
 
 ---
 
-# Named Queries
+## Where Query
+
+<pre class="brush:groovy; highlight:[];">
+Customer.where {
+  	serviceLevel.name == 'Gold' 
+	&& 
+	incidents.size() > 5
+}.list()
+</pre>
+
+find all customers with gold service level and more than 5 incidents
+
+---
+
+## Named Queries
  
-- Since Grails 1.2 http://grails.org/doc/latest/ref/Domain %20Classes/namedQueries.html
 - Allow you to define criteria queries as part of the domain class
 - Can be chained together
-- Can be combined with dynamic finders Break down queries into components
+- Can be combined with dynamic finders 
+- Break down queries into components
 
 ---
 
-# Auto Timestamping
+<pre class="brush:groovy; highlight:[];">
+	class Customer {
+	    //...
+	    static namedQueries = {
+	        goldLevelMoreThanFiveIncidents {
+	            byServiceLevelName('Gold')
+	            moreThanFiveIncidents()
+	        }
+
+	        moreThanFiveIncidents {
+	            sizeGt('incidents', 5)
+	        }
+
+	        byServiceLevelName { serviceLevelName ->
+	            serviceLevel {
+	                eq('name', serviceLevelName)
+	            }
+	        }
+	    }
+</pre>
+
+---
+
+## Auto Timestamping
 
 - Two special properties for domain classes
-	- dateCreated
-	- lastUpdated
+    - dateCreated
+    - lastUpdated
 - Must be nullable
 - Will be set automatically when object is persisted to the database
 
 ---
   
-# Events
+## Events
 
 - beforeInsert - Executed before an object is initially persisted to the database
 - beforeUpdate - Executed before an object is updated 
