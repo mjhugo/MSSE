@@ -237,7 +237,7 @@ invoke
 ## Problem
 
 - Something more advanced than a dynamic finder
-- Dynamic finders are great, but can lead to programmer laziness and performance issues
+- Dynamic finders are great but can lead to programmer laziness and performance issues
 
 ---
 
@@ -529,7 +529,7 @@ def search(accountNumber, name, state) {
 ## Where Queries
 
 - Define a query using boolean logic
-- Can be combined (not quite like chaining)
+- Can be combined
 - Can be combined with dynamic finders 
 
 ---
@@ -545,6 +545,20 @@ Customer.where {
 </pre>
 
 find all customers with gold service level and more than 5 incidents
+
+---
+
+## Combining Where Queries
+
+<pre class="brush:groovy; highlight:[];">
+def query = Person.where {
+     lastName == "Simpson"
+}
+def bartQuery = query.where {
+     firstName == "Bart"
+}
+Person p = bartQuery.find()
+</pre>
 
 ---
 

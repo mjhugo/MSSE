@@ -69,7 +69,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 	- Create the database if it doesn't exist, and modify it if it does exist
 - not defined
 	- do nothing to the database
-	
+
 ---------------
 
 ## DB Console 
@@ -105,6 +105,9 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 -----------
 
+# A day in the life of a Grails Domain Class
+
+-----------
 
 <pre class="brush: groovy; highlight:[1]">
 	class Customer {
@@ -230,13 +233,15 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 ## SQL Logging
 
 - turn on SQL logging with `logSql = true` in `grails-app/conf/DataSource.groovy`
+- optionally format sql logging with `formatSql = true` in `grails-app/conf/DataSource.groovy`
 
-<pre class="brush: groovy; highlight:[5]">
+<pre class="brush: groovy; highlight:[5,6]">
 	dataSource {
 		pooled = false
 		username = "sa"
 		password = ""
 	    logSql = true
+		formatSql = true
 	}
 </pre>
 	
@@ -314,31 +319,6 @@ void testUpdate() {
 	WHERE
 	    id=?
 	AND version=?
-</pre>
-
----
-
-## Implicit Update
-
-<pre class="brush: java; highlight:[15, 16, 17]">
-void testUpdateImplicit() {
-    assert 0 == Customer.count()
-
-    def c = new Customer(name: 'Mike', accountNumber: '123');
-    c.save();
-
-    c.name = 'Jim'
-    c.save()
-
-    assert c.name == Customer.get(c.id).name
-
-    // beware the implicit update
-    c.name = 'John'
-
-    // even though c.save() hasn't been called,
-    // the new name 'John' has been persisted!
-    assert 'John' == Customer.get(c.id).name
-}
 </pre>
 
 ---
@@ -446,7 +426,9 @@ class Customer {
 	String accountNumber
 }
 </pre>
+
 is the same as
+
 <pre class="brush: groovy;highlight:[4,5,6,7]">
 class Customer { 
 	String name
@@ -888,3 +870,4 @@ class Product {
     static hasMany = [customers:CustomerProduct]
 }
 </pre>
+
