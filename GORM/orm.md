@@ -72,10 +72,15 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 ---------------
 
-## DB Console 
+## Helpful Tool: DB Console 
 
 * grails run-app
 * browse to http://localhost:8080/dbconsole
+
+--- 
+
+## Helpful Tool: DB Console 
+
 * use driver, username, password, url from `grails-app/conf/DataSource.groovy`
 
 <pre class="brush: groovy; highlight:[2,3,4, 10]">
@@ -87,13 +92,11 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 	environments {
 	    development {
 	        dataSource {
-	            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+	            dbCreate = "create-drop" 
 	            url = "jdbc:h2:mem:devDb;MVCC=TRUE"
 	        }
 	    }
 </pre>
-
-
 
 ---------------
 
@@ -216,6 +219,42 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 --------
 
+# Test early, test often
+
+--------
+
+## Types of Tests
+
+- Unit Tests
+	- Use `@TestFor` to mock Domain class behavior
+	- Concurrent HashMap ORM implementation
+	- No support for 
+		- transactions
+		- HQL queries
+		- composite keys
+		- dirty checking methods
+
+--------
+
+## Types of Tests
+
+- Integration Tests
+	- Full grails environment
+	- Hibernate ORM and H2 in-memory DB
+	- HQL Queries
+	- Dependencies injected automatically
+
+--------
+
+## Which type to write?
+
+- Personal/team preference, but...
+	- __Unit__ test as much as possible
+	- __Integration__ test when required
+- Or where specifically requested (in requirements on the assignment)
+
+--------
+
 # CRUD
 
 --------
@@ -230,7 +269,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 
 ---
 
-## SQL Logging
+## Helpful Tool:  SQL Logging
 
 - turn on SQL logging with `logSql = true` in `grails-app/conf/DataSource.groovy`
 - optionally format sql logging with `formatSql = true` in `grails-app/conf/DataSource.groovy`
@@ -403,7 +442,7 @@ c.save()
 println c.errors
 </pre>
 
-<pre class="brush: text;highlight:[5,8]">
+<pre class="brush: text;highlight:[5,8], class-name: smaller">
 org.springframework.validation.BeanPropertyBindingResult:
   2 errors
 Field error in object 'Customer' on field 'accountNumber': 
@@ -437,6 +476,18 @@ class Customer {
 		name(nullable:false)
 		accountNumber(nullable:false)
 	}
+}
+</pre>
+
+---
+
+## Testing Constraints
+
+<pre class="brush: groovy;highlight:[4]">
+void testTitleIsRequired() {
+	Book book = new Book()
+	book.save()
+	assert "nullable" == book.errors['title'].code
 }
 </pre>
 
@@ -476,18 +527,18 @@ String accountNumber
 String phone
 Date dateCreated
 static constraints = {
-	// name must be at least 2 chars; no more than 100
-	name(nullable:false, size:2..100)
-	// account number min length of 1 and max of 5 chars
-	accountNumber(nullable:true, size:1..5)
-	// phone number must be 10 digits
-	phone(nullable:true, matches: /(\d{10})?/)
+  // name must be at least 2 chars; no more than 100
+  name(nullable:false, size:2..100)
+  // account number min length of 1 and max of 5 chars
+  accountNumber(nullable:true, size:1..5)
+  // phone number must be 10 digits
+  phone(nullable:true, matches: /(\d{10})?/)
 }
 </pre>
 
 ---
 
-<pre class="brush: groovy; highlight:[4]">
+<pre class="brush: groovy; highlight:[4]; class-name:smaller">
 // ...
 static constraints = {
 	// name must be at least 2 chars; no more than 100
@@ -500,7 +551,7 @@ static constraints = {
 }
 </pre>
 
-<pre class="brush: text; highlight:[9]">
+<pre class="brush: text; highlight:[9]; class-name:smaller">
 mysql> describe customer;
 +----------------+--------------+------+-----+---------+
 | Field          | Type         | Null | Key | Default |
@@ -518,7 +569,7 @@ name field gets max length in DB of 100
 
 ---
 
-<pre class="brush: groovy; highlight:[6]">
+<pre class="brush: groovy; highlight:[6]; class-name:smaller">
 // ...
 static constraints = {
 	// name must be at least 2 chars; no more than 100
@@ -531,7 +582,7 @@ static constraints = {
 }
 </pre>
 
-<pre class="brush: text; highlight:[7]">
+<pre class="brush: text; highlight:[7]; class-name:smaller">
 mysql> describe customer;
 +----------------+--------------+------+-----+---------+
 | Field          | Type         | Null | Key | Default |
@@ -549,7 +600,7 @@ account number nullable and max length of 5
 
 ---
 
-<pre class="brush: groovy; highlight:[8]">
+<pre class="brush: groovy; highlight:[8]; class-name:smaller">
 // ...
 static constraints = {
 	// name must be at least 2 chars; no more than 100
@@ -562,7 +613,7 @@ static constraints = {
 }
 </pre>
 
-<pre class="brush: text; highlight:[10]">
+<pre class="brush: text; highlight:[10]; class-name:smaller">
 mysql> describe customer;
 +----------------+--------------+------+-----+---------+
 | Field          | Type         | Null | Key | Default |
@@ -580,7 +631,7 @@ phone number gets default max size of 255 and nullable
 
 ---
 
-<pre class="brush: groovy; highlight:[9]">
+<pre class="brush: groovy; highlight:[9]; class-name:smaller">
 // ...
 static constraints = {
 	// name must be at least 2 chars; no more than 100
@@ -593,7 +644,7 @@ static constraints = {
 }
 </pre>
 
-<pre class="brush: text; highlight:[8]">
+<pre class="brush: text; highlight:[8]; class-name:smaller">
 mysql> describe customer;
 +----------------+--------------+------+-----+---------+
 | Field          | Type         | Null | Key | Default |
@@ -624,6 +675,10 @@ groovy> def c = new Customer()
 groovy> println c.validate()
 false	
 </pre>
+
+---
+
+## Validation
 
 - if validation fails, errors are placed in the errors property of the domain class
 	- can also check hasErrors()
@@ -763,6 +818,10 @@ class Address {
 - Address belongs to Customer
 - Saves and Deletes to Customer will cascade to Address
 
+---
+
+## Many to One - Bidirectional
+
 <pre class="brush:groovy;">
 customer.address = new Address()
 customer.save()
@@ -791,10 +850,10 @@ customer.save()
 
 - default is java.util.Set; can use
 	- SortedSet (must implement comparable)
-	- List (adds {table}_idx column)
+	- List (adds `{table_name}_idx` column)
 - convenience methods:
-	- customer.addToIncidents(incident)
-	- customer.removeFromIncidents(incident)
+	- `customer.addToIncidents(incident)`
+	- `customer.removeFromIncidents(incident)`
 	
 ---
 
@@ -802,7 +861,7 @@ customer.save()
 
 ![one to many](images/oneToMany.png "One To Many")
 
-<pre class="brush:groovy;">
+<pre class="brush:groovy;class-name:smaller">
 class Customer { 
 	static hasMany = [incidents:Incident]
 }

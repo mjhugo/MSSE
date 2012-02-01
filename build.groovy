@@ -6,7 +6,7 @@ import groovy.text.SimpleTemplateEngine
 File targetDir = new File('target')
 targetDir.mkdir()
 
-boolean continuousBuild = true
+boolean continuousBuild = false
 
 if (continuousBuild){
 	def start = new Date().time
@@ -47,7 +47,7 @@ void generateHtmlSlides(File sourceFile, File targetDir){
 	String fileBaseName = sourceFile.name - '.md'
 	File parentDirectory = sourceFile.parentFile
 
-	String html = new org.pegdown.PegDownProcessor().markdownToHtml(sourceFile.text).replaceAll('<hr/>','</div><div class="slide">')
+	String html = new org.pegdown.PegDownProcessor().markdownToHtml(sourceFile.text).replaceAll('<hr/>','</div>\n<hr/>\n<div class="slide">')
 
  	Map binding = [slides:html, title:parentDirectory.name]
 
@@ -57,6 +57,17 @@ void generateHtmlSlides(File sourceFile, File targetDir){
 
 	File outputFile = new File("target/${parentDirectory.name}/${fileBaseName}.html")
 	outputFile.text =new SimpleTemplateEngine().createTemplate(templateText).make(binding).toString()
+	
+	StringBuffer printHtml = new StringBuffer()
+	int pageCounter = 0
+	binding.slides.eachLine{line ->
+		if ('<hr/>' == line.trim()){
+			printHtml.append("${++pageCounter}<hr/>\n")
+		} else {
+			printHtml.append("$line\n")
+		}
+	}
+	binding.slides = printHtml.toString()
 	
 	templateText = new File('print.template.html').text
 	outputFile = new File("target/${parentDirectory.name}/${fileBaseName}.print.html")

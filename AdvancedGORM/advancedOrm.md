@@ -158,7 +158,7 @@ intercept
 
 ---
 
-<pre class="brush:groovy; highlight:[14,15]; class-name:smaller">
+<pre class="brush:groovy; highlight:[15,16]; class-name:smaller">
 class AddressBook {
   static people = [
       new Person(name: 'Mike', gender: 'M'),
@@ -187,7 +187,7 @@ cache
 
 ---
 
-<pre class="brush:groovy; highlight:[16,17]; class-name:smaller">
+<pre class="brush:groovy; highlight:[17,18]; class-name:smaller">
 class AddressBook {
   static people = [
       new Person(name: 'Mike', gender: 'M'),
@@ -226,7 +226,6 @@ invoke
     - methodMissing
     - method cached
     - method invokved
-
 - Second Time
     - ab.findByName('Robin')
     - invokeMethod
@@ -482,8 +481,22 @@ def customerByName(nameToFind) {
 ---
 
 <pre class="brush:groovy; highlight:[];">
+def customersByName(String theName) {
+	def c = Customer.createCriteria() 
+	return c.list() {
+    	eq('name', theName)
+    }
+}
+</pre>
+
+simple: find all customers by name
+
+---
+
+<pre class="brush:groovy; highlight:[];">
 def goldWithFiveCriteria() {
-	def c = Customer.createCriteria() return c.list() {
+	def c = Customer.createCriteria() 
+	return c.list() {
         serviceLevel {
             eq('name', 'Gold')
 		}
@@ -529,8 +542,6 @@ def search(accountNumber, name, state) {
 ## Where Queries
 
 - Define a query using boolean logic
-- Can be combined
-- Can be combined with dynamic finders 
 
 ---
 
