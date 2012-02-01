@@ -7,9 +7,9 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	
-	<title>deck.js</title>
+	<title>ORMIntro</title>
 	
-	<meta name="description" content="deck.js">
+	<meta name="description" content="ORMIntro">
 	<meta name="author" content="Mike Hugo">
 	<meta name="viewport" content="width=1024, user-scalable=no">
 	
@@ -34,29 +34,163 @@
 
 <body class="deck-container">
 <div class="slide">
-<h1>deck.js</h1><p>A JavaScript library for building modern HTML presentations. deck.js is flexible enough to let advanced CSS and JavaScript authors craft highly customized decks, but also provides templates and themes for the HTML novice to build a standard slideshow.</p><h2>Dependencies (included in this repository)</h2>
+<h1>Introduction to Object Relational Mapping</h1>
+</div>
+<hr/>
+<div class="slide"><p><img src="images/classdiagram.jpg" class="fill" ></p>
+</div>
+<hr/>
+<div class="slide"><p><img src="images/erd.png" class="fill" ></p>
+</div>
+<hr/>
+<div class="slide"><h2>Object Relational Impedance Mismatch</h2>
 <ul>
-  <li><a href="http://jquery.com">jQuery</a></li>
-  <li><a href="http://modernizr.com">Modernizr</a></li>
-</ul><h2>Documentation</h2><p>Check out the <a href="http://imakewebthings.github.com/deck.js/docs">documentation page</a> for more information on the methods, events, and options available in core and all the included extensions. A sample standard slide deck is included in the package under the <code>introduction</code> folder. You can also <a href="http://imakewebthings.github.com/deck.js/introduction">view that sample deck</a> online to play with the available style and transition themes.</p><h2>Extensions, Themes, and Related Projects</h2><p>Take a look at <a href="https://github.com/imakewebthings/deck.js/wiki">the wiki</a> for lists of extensions, themes, and other related goodies. If you have a publicly available project of your own, feel free to add to the list.</p><h2>Tests &amp; Support</h2><p>Unit tests are written with <a href="http://pivotal.github.com/jasmine/">Jasmine</a> and <a href="https://github.com/velesin/jasmine-jquery">jasmine-jquery</a>. You can <a href="http://imakewebthings.github.com/deck.js/test">run them here</a>.</p><p>deck.js has been tested with jQuery 1.6+ and works in IE7+, Chrome, FF, Safari, and Opera. The more capable browsers receive greater enhancements, but a basic cutaway slideshow will work for all browsers listed above. Please don't give your presentations in IE6.</p><p>For any questions or general discussion about deck.js please direct your attention to the <a href="http://groups.google.com/group/deckjs">mailing list</a> (uses Google groups.) If you would like to report a bug, please see the <a href="https://github.com/imakewebthings/deck.js/issues">issues page</a>.</p><h2>Known Bug(s)</h2><p>There is an issue with certain builds of Chrome that result in a solid blue background and generally broken decks. This is a bug in Chrome (<a href="http://code.google.com/p/chromium/issues/detail?id=91518">Issue 91518</a>) that stems from hardware acceleration of 3d transforms. Current workarounds:</p>
+  <li>Inheritance, abstraction, polymorphism</li>
+</ul><p><img src="images/inheritance.png" ></p>
+</div>
+<hr/>
+<div class="slide"><h2>Object Relational Impedance Mismatch</h2>
 <ul>
-  <li>Use a different browser. This problem doesn't exist in Safari, FF, Opera.</li>
-  <li>Disable hardware compositing by setting <code>--disable-accelerated-compositing</code> in the Chrome loading options</li>
-  <li>Replace instances of <code>translate3d</code> with <code>translate</code> in the CSS of your decks (though this will slow down performance on iOS devices and Safari.)</li>
-</ul><h2>Printing</h2><p>Core includes stripped down black and white print styles for the standard slide template that is suitable for handouts.</p><h2>Awesome Contributors</h2>
+  <li>Different data types (String vs. VARCHAR(255))</li>
+</ul>
+<pre class="brush: groovy">
+	class Customer {
+		Long id
+		String name // how many characters long could this be?
+	}
+</pre>
+<pre class="brush:text; highlight:[];">
+	mysql> describe customer;
+	+----------------+--------------+------+-----+---------+
+	| Field          | Type         | Null | Key | Default |
+	+----------------+--------------+------+-----+---------+
+	| id             | bigint(20)   | NO   | PRI | NULL    |
+	| name           | varchar(255) | NO   |     | NULL    |
+	+----------------+--------------+------+-----+---------+
+</pre>
+</div>
+<hr/>
+<div class="slide"><h2>Object Relational Impedance Mismatch</h2>
 <ul>
-  <li><a href="https://github.com/jbuck">jbuck</a></li>
-  <li><a href="https://github.com/cykod">cykod</a></li>
-  <li><a href="https://github.com/dougireton">dougireton</a></li>
-  <li><a href="https://github.com/awirick">awirick</a></li>
-  <li>Daniel Knittl-Frank</li>
-</ul><p>If you would like to contribute a patch to deck.js please do as much as you can of the following:</p>
+  <li>Relationships
+  <ul>
+    <li>objects are related by reference, DB records related by primary and foreign keys</li>
+  </ul></li>
+</ul><p><img src="images/erd-jointable.png"> </p>
+</div>
+<hr/>
+<div class="slide"><h2>impedance mismatch</h2><p><img src="images/squarePegRoundHole.jpg" class="fill"></p><p>http://www.flickr.com/photos/jeffsand/3871415191</p>
+</div>
+<hr/>
+<div class="slide"><h2>Why</h2>
 <ul>
-  <li>Add or amend Jasmine tests.</li>
-  <li>Add inline documentation.</li>
-  <li>If the standard snippet of an extension changes, please change it in both the introduction deck and the snippet html in the extension folder.</li>
-  <li>If the API changes, it would be awesome to receive a parallel pull request to the gh-pages branch which updates the public-facing documentation.</li>
-</ul><h2>License</h2><p>Copyright (c) 2011 Caleb Troughton</p><p>Dual licensed under the <a href="https://github.com/imakewebthings/deck.js/blob/master/MIT-license.txt">MIT license</a> and <a href="https://github.com/imakewebthings/deck.js/blob/master/GPL-license.txt">GPL license</a>.</p>
+  <li>Databases are good at storing data</li>
+  <li>Relational Databases are common</li>
+  <li>Proven mathematical foundation
+  <ul>
+    <li>Edgar F. Codd, "A Relational Model of Data for Large Shared Data Banks" 1970</li>
+  </ul></li>
+  <li>Mature products (both for profit and open source)
+  <ul>
+    <li>Oracle, SQL Server</li>
+    <li>MySql, PostgreSQL</li>
+  </ul></li>
+</ul>
+</div>
+<hr/>
+<div class="slide"><h2>It's changing</h2>
+<ul>
+  <li>NoSQL - Not Only SQL
+  <ul>
+    <li>key/value</li>
+    <li>document</li>
+    <li>graph</li>
+    <li>column</li>
+  </ul></li>
+  <li>Relational model isn't <em>always</em> the best mechanism to store data for every application</li>
+</ul>
+</div>
+<hr/>
+<div class="slide"><h2>ORM Persistence patterns</h2>
+<ul>
+  <li>Service / Data Transfer Object</li>
+</ul>
+<pre class="brush: groovy">
+	class Customer { // domain class
+		Long id
+		String name
+		CustomerDTO buildDto(){...}
+	}
+
+	class CustomerDto { // data transfer object
+		Long id
+		String name
+	}
+	
+	class CustomerService { // persistence logic
+		void save(CustomerDto){....}
+		CustomerDto read(Long id){....}
+	}
+</pre>
+</div>
+<hr/>
+<div class="slide"><h2>ORM Persistence patterns</h2>
+<ul>
+  <li>Data Access Object</li>
+</ul>
+<pre class="brush: groovy">
+	class Customer { // domain class
+		Long id
+		String name
+	}
+
+	class CustomerDao { // data access object
+		void save(CustomerDao){....}
+		CustomerDao read(Long id){....}
+	}
+</pre>
+</div>
+<hr/>
+<div class="slide"><h2>ORM Persistence patterns</h2>
+<ul>
+  <li>Active Record</li>
+</ul>
+<pre class="brush: groovy">
+	class Customer { // domain class
+		Long id
+		String name
+
+		void save(){....}
+		Customer read(Long id){....}
+	}
+</pre>
+</div>
+<hr/>
+<div class="slide"><h2>ORM Frameworks (just to name a few)</h2>
+<ul>
+  <li>Java
+  <ul>
+    <li>Hibernate (Grails default)</li>
+    <li>IBATIS</li>
+    <li>JDO</li>
+    <li>EclipseLink</li>
+  </ul></li>
+  <li>.NET
+  <ul>
+    <li>NHibernate</li>
+    <li>Entity Framework</li>
+  </ul></li>
+</ul>
+</div>
+<hr/>
+<div class="slide"><h2>References</h2>
+<ul>
+  <li>http://www.agiledata.org/essays/mappingObjects.html</li>
+  <li>"Persistence in the Enterprise: A Guide to Persistence Technologies" Geoffrey Hambrick</li>
+  <li>http://en.wikipedia.org/wiki/Relational_model</li>
+  <li>http://www.dcs.fmph.uniba.sk/diplomovky/obhajene/getfile.php/dp.orsag.orm.pdf?id=86&amp;fid=147&amp;type=application%2Fpdf</li>
+  <li>http://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf</li>
+</ul>
 </div>
 
 <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>

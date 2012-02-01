@@ -21,6 +21,14 @@
 	font-size:2.5em;
 }
 
+.slide ul {
+	margin-bottom:0;
+}
+
+.deck-container .slide code {
+	color: black;
+}
+
 .attribution {
 	display: block;
 	position: fixed;
@@ -29,3 +37,14 @@
 	z-index: 100; 
 	font-size:0.6666em;
 }
+
+@media screen {
+	img.fill {
+		position:fixed;
+		top:0;
+		left:0; 
+		min-width:100%;
+		min-height:100%;
+	}
+}
+

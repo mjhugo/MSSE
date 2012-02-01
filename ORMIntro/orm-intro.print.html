@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+	<title>ORMIntro</title>
+	
+	<meta name="description" content="ORMIntro">
+	<meta name="author" content="Mike Hugo">
+	<meta name="viewport" content="width=1024, user-scalable=no">
+	
+	<!-- Core and extension CSS files -->
+	<!-- <link rel="stylesheet" href="../deck.js/core/deck.core.css"> -->
+	
+	<link href="../deck.js.custom/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
+	<link href="../deck.js.custom/syntaxhighlighter/styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
+
+	<style>
+	@media print {
+		.slide {
+			page-break-inside:avoid;
+		}
+	}
+	</style>
+
+</head>
+
+<body class="deck-container">
+<div class="slide">
+<h1>Introduction to Object Relational Mapping</h1>
+</div>
+1<hr/>
+<div class="slide"><p><img src="images/classdiagram.jpg" class="fill" ></p>
+</div>
+2<hr/>
+<div class="slide"><p><img src="images/erd.png" class="fill" ></p>
+</div>
+3<hr/>
+<div class="slide"><h2>Object Relational Impedance Mismatch</h2>
+<ul>
+  <li>Inheritance, abstraction, polymorphism</li>
+</ul><p><img src="images/inheritance.png" ></p>
+</div>
+4<hr/>
+<div class="slide"><h2>Object Relational Impedance Mismatch</h2>
+<ul>
+  <li>Different data types (String vs. VARCHAR(255))</li>
+</ul>
+<pre class="brush: groovy">
+	class Customer {
+		Long id
+		String name // how many characters long could this be?
+	}
+</pre>
+<pre class="brush:text; highlight:[];">
+	mysql> describe customer;
+	+----------------+--------------+------+-----+---------+
+	| Field          | Type         | Null | Key | Default |
+	+----------------+--------------+------+-----+---------+
+	| id             | bigint(20)   | NO   | PRI | NULL    |
+	| name           | varchar(255) | NO   |     | NULL    |
+	+----------------+--------------+------+-----+---------+
+</pre>
+</div>
+5<hr/>
+<div class="slide"><h2>Object Relational Impedance Mismatch</h2>
+<ul>
+  <li>Relationships
+  <ul>
+    <li>objects are related by reference, DB records related by primary and foreign keys</li>
+  </ul></li>
+</ul><p><img src="images/erd-jointable.png"> </p>
+</div>
+6<hr/>
+<div class="slide"><h2>impedance mismatch</h2><p><img src="images/squarePegRoundHole.jpg" class="fill"></p><p>http://www.flickr.com/photos/jeffsand/3871415191</p>
+</div>
+7<hr/>
+<div class="slide"><h2>Why</h2>
+<ul>
+  <li>Databases are good at storing data</li>
+  <li>Relational Databases are common</li>
+  <li>Proven mathematical foundation
+  <ul>
+    <li>Edgar F. Codd, "A Relational Model of Data for Large Shared Data Banks" 1970</li>
+  </ul></li>
+  <li>Mature products (both for profit and open source)
+  <ul>
+    <li>Oracle, SQL Server</li>
+    <li>MySql, PostgreSQL</li>
+  </ul></li>
+</ul>
+</div>
+8<hr/>
+<div class="slide"><h2>It's changing</h2>
+<ul>
+  <li>NoSQL - Not Only SQL
+  <ul>
+    <li>key/value</li>
+    <li>document</li>
+    <li>graph</li>
+    <li>column</li>
+  </ul></li>
+  <li>Relational model isn't <em>always</em> the best mechanism to store data for every application</li>
+</ul>
+</div>
+9<hr/>
+<div class="slide"><h2>ORM Persistence patterns</h2>
+<ul>
+  <li>Service / Data Transfer Object</li>
+</ul>
+<pre class="brush: groovy">
+	class Customer { // domain class
+		Long id
+		String name
+		CustomerDTO buildDto(){...}
+	}
+
+	class CustomerDto { // data transfer object
+		Long id
+		String name
+	}
+	
+	class CustomerService { // persistence logic
+		void save(CustomerDto){....}
+		CustomerDto read(Long id){....}
+	}
+</pre>
+</div>
+10<hr/>
+<div class="slide"><h2>ORM Persistence patterns</h2>
+<ul>
+  <li>Data Access Object</li>
+</ul>
+<pre class="brush: groovy">
+	class Customer { // domain class
+		Long id
+		String name
+	}
+
+	class CustomerDao { // data access object
+		void save(CustomerDao){....}
+		CustomerDao read(Long id){....}
+	}
+</pre>
+</div>
+11<hr/>
+<div class="slide"><h2>ORM Persistence patterns</h2>
+<ul>
+  <li>Active Record</li>
+</ul>
+<pre class="brush: groovy">
+	class Customer { // domain class
+		Long id
+		String name
+
+		void save(){....}
+		Customer read(Long id){....}
+	}
+</pre>
+</div>
+12<hr/>
+<div class="slide"><h2>ORM Frameworks (just to name a few)</h2>
+<ul>
+  <li>Java
+  <ul>
+    <li>Hibernate (Grails default)</li>
+    <li>IBATIS</li>
+    <li>JDO</li>
+    <li>EclipseLink</li>
+  </ul></li>
+  <li>.NET
+  <ul>
+    <li>NHibernate</li>
+    <li>Entity Framework</li>
+  </ul></li>
+</ul>
+</div>
+13<hr/>
+<div class="slide"><h2>References</h2>
+<ul>
+  <li>http://www.agiledata.org/essays/mappingObjects.html</li>
+  <li>"Persistence in the Enterprise: A Guide to Persistence Technologies" Geoffrey Hambrick</li>
+  <li>http://en.wikipedia.org/wiki/Relational_model</li>
+  <li>http://www.dcs.fmph.uniba.sk/diplomovky/obhajene/getfile.php/dp.orsag.orm.pdf?id=86&amp;fid=147&amp;type=application%2Fpdf</li>
+  <li>http://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf</li>
+</ul>
+
+</div>
+
+<p class="attribution" style="font-size:0.6em;"><a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/80x15.png" /></a> &nbsp;Mike Hugo, <a href="http://piragua.com">Piragua Consulting, Inc.</a>
+</p>
+
+
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushPlain.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushGroovy.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushSql.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	SyntaxHighlighter.defaults['toolbar'] = false;
+    SyntaxHighlighter.all()
+</script>
+
+</body>
+</html>
