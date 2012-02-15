@@ -75,7 +75,7 @@ These classes are automatically mapped to the DB through Hibernate (or other GOR
 ## Helpful Tool: DB Console 
 
 * grails run-app
-* browse to http://localhost:8080/dbconsole
+* browse to http://localhost:8080/{appname}/dbconsole
 
 --- 
 
