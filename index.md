@@ -15,3 +15,9 @@ Source code for in-class examples and slides can be found at [https://github.com
 	- [Slides (deck.js)](AdvancedGORM/advancedOrm.html)
 	- [Single Page HTML](AdvancedGORM/advancedOrm.print.html)
 	- [PDF](AdvancedGORM/advancedOrm.pdf)
+
+## Week 6 (2/4/2012)
+- [Layouts and SiteMesh](Layouts/SiteMesh.pdf)
+- [Tag Libraries](Tags/Tags.pdf)
+	- Sample Code:  https://github.com/mjhugo/MSSE/tree/master/Tags/sample-code/tags
+- [Mobile Views](MobileViews/MobileViews.pdf)
