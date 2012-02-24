@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="layout" content="main">
-    <title>Reports</title>
+    <title>Counts</title>
 </head>
 
 <body>
@@ -18,10 +18,9 @@
 </div>
 
 <div class="content" role="main">
-    <h1>Reports</h1>
+    <h1>Incident Counts for the year ${year}</h1>
 
-    <p><g:link controller="report" action="counts">Counts</g:link></p>
-    <p><g:link controller="report" action="countIncidentsByYear">Count Incidents by Year</g:link></p>
+    <p>Total:  ${total}</p>
 
 </div>
 </body>

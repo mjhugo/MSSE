@@ -13,4 +13,14 @@ class ReportController {
 
         render (view:'counts', model:model)
     }
+
+    def countIncidentsByYear() {
+        Date begin = Date.parse('yyyy', params.year)
+        Date end = Date.parse('yyyy', "${params.int('year') + 1}")
+
+        int count = Incident.countByDateReportedGreaterThanEqualsAndDateReportedLessThan(begin, end)
+
+        render (view:'countsByYear', model:[total:count, year:params.year])
+
+    }
 }
