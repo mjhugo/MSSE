@@ -16,13 +16,13 @@ Source code for in-class examples and slides can be found at [https://github.com
 	- [Single Page HTML](AdvancedGORM/advancedOrm.print.html)
 	- [PDF](AdvancedGORM/advancedOrm.pdf)
 
-## Week 6 (2/4/2012)
+## Week 6 (2/24/2012)
 - [Layouts and SiteMesh](Layouts/SiteMesh.pdf)
 - [Tag Libraries](Tags/Tags.pdf)
 	- [Sample Code](https://github.com/mjhugo/MSSE/tree/master/Tags/sample-code/tags)
 - [Mobile Views](MobileViews/MobileViews.pdf)
 
-## Week 7 (2/4/2012)
+## Week 7 (3/3/2012)
 - [Filters](Filters/Filters.pdf)
 	- [Sample Code](https://github.com/mjhugo/MSSE/tree/master/Filters/sec)
 - [WebApp Security](WebAppSecurity/WebAppSecurity.pdf)
