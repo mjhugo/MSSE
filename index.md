@@ -21,3 +21,13 @@ Source code for in-class examples and slides can be found at [https://github.com
 - [Tag Libraries](Tags/Tags.pdf)
 	- [Sample Code](https://github.com/mjhugo/MSSE/tree/master/Tags/sample-code/tags)
 - [Mobile Views](MobileViews/MobileViews.pdf)
+
+## Week 7 (2/4/2012)
+- [Filters](Filters/Filters.pdf)
+	- [Sample Code](https://github.com/mjhugo/MSSE/tree/master/Filters/sec)
+- [WebApp Security](WebAppSecurity/WebAppSecurity.pdf)
+
+## Week 8 (3/9/2012)
+- [Services](Services/Services.pdf)
+- [WebServices](Services/WebServices.pdf)
+- [Messaging](Messaging/Messaging.pdf)
