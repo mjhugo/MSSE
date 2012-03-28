@@ -31,3 +31,13 @@ Source code for in-class examples and slides can be found at [https://github.com
 - [Services](Services/Services.pdf)
 - [WebServices](Services/WebServices.pdf)
 - [Messaging](Messaging/Messaging.pdf)
+
+## Week 10 (3/30/2012)
+- Functional Testing
+	- [Slides (deck.js)](BuildingQuality/FunctionalTesting.html)
+	- [Single Page HTML](BuildingQuality/FunctionalTesting.print.html)
+	- [PDF](BuildingQuality/FunctionalTesting.pdf)
+- Quality - tools
+	- [Slides (deck.js)](BuildingQuality/Quality-Tools.html)
+	- [Single Page HTML](BuildingQuality/Quality-Tools.print.html)
+	- [PDF](BuildingQuality/Quality-Tools.pdf)

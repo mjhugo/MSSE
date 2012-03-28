@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+	<title>BuildingQuality</title>
+	
+	<meta name="description" content="BuildingQuality">
+	<meta name="author" content="Mike Hugo">
+	<meta name="viewport" content="width=1024, user-scalable=no">
+	
+	<!-- Core and extension CSS files -->
+	<!-- <link rel="stylesheet" href="../deck.js/core/deck.core.css"> -->
+	
+	<link href="../deck.js.custom/syntaxhighlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
+	<link href="../deck.js.custom/syntaxhighlighter/styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
+
+	<style>
+	@media print {
+		.slide {
+			page-break-inside:avoid;
+		}
+	}
+	</style>
+
+</head>
+
+<body class="deck-container">
+<div class="slide">
+<h1>Functional Testing</h1>
+</div>
+1<hr/>
+<div class="slide"><h2>Test Automation</h2>
+<ul>
+  <li>Frequent regression testing</li>
+  <li>earlier feedback on problems (lower cost to fix)</li>
+  <li>enables continuous delivery</li>
+  <li>statistics</li>
+</ul>
+</div>
+2<hr/>
+<div class="slide"><h2>Multiple Browser Problem</h2>
+<ul>
+  <li>Something works in Chrome but not IE</li>
+  <li>different operating systems</li>
+  <li>different plugins (e.g. Flash)</li>
+</ul>
+</div>
+3<hr/>
+<div class="slide"><h2>Difficulties</h2>
+<ul>
+  <li>can be hard if the UI is constantly changing</li>
+  <li>can automate some level of UI testing, but perhaps not things like "does it look good", or "is XYZ element in the correct place"</li>
+  <li>some requirements still need a human to verify them</li>
+</ul>
+</div>
+4<hr/>
+<div class="slide"><h2>Selenium</h2>
+<ul>
+  <li>Started as JS plugin that ran in browser</li>
+  <li>could run in multiple browsers</li>
+  <li>shortcomings of a JS lib - sandbox restrictions</li>
+  <li>Selenium 2 - WebDriver</li>
+</ul>
+</div>
+5<hr/>
+<div class="slide"><h2>Supported browsers:</h2>
+<ul>
+  <li>Google Chrome 12.0.712.0+</li>
+  <li>Internet Explorer 6, 7, 8, 9 - 32 and 64-bit where applicable</li>
+  <li>Firefox 3.0, 3.5, 3.6, 4.0, 5.0, 6, 7</li>
+  <li>Opera 11.5+</li>
+  <li>HtmlUnit 2.9 (headless, limited JS support)</li>
+  <li>Android - 2.3+ for phones and tablets (devices &amp; emulators)</li>
+  <li>iOS 3+ for phones (devices &amp; emulators) and 3.2+ for tablets (devices &amp; emulators)</li>
+</ul>
+</div>
+6<hr/>
+<div class="slide"><h2>Selenium IDE</h2>
+<ul>
+  <li>plugin for firefox</li>
+  <li>recommended only for prototyping / debugging</li>
+  <li>record/playback capability</li>
+  <li>very scripted tests, virtually no reuse</li>
+</ul>
+</div>
+7<hr/>
+<div class="slide"><h2>Types of Tests</h2>
+<ul>
+  <li>Static content
+  <ul>
+    <li>does a page have the expected title</li>
+    <li>the expected image</li>
+    <li>the expected footer, etc</li>
+  </ul></li>
+</ul>
+</div>
+8<hr/>
+<div class="slide"><h2>Types of Tests</h2>
+<ul>
+  <li>Links
+  <ul>
+    <li>checking for broken links, and/or that links go to the correct location</li>
+  </ul></li>
+</ul>
+</div>
+9<hr/>
+<div class="slide"><h2>Types of Tests</h2>
+<ul>
+  <li>Functional Tests
+  <ul>
+    <li>user interaction with the site</li>
+    <li>form submission</li>
+    <li>usually multiple steps</li>
+    <li>registration, login, create listing, place bid, etc.</li>
+  </ul></li>
+</ul>
+</div>
+10<hr/>
+<div class="slide"><h2>Assert vs. Verify</h2>
+<ul>
+  <li>assert fails the test</li>
+  <li>verify logs a error but continues with the test</li>
+</ul>
+</div>
+11<hr/>
+<div class="slide"><h2>Locators</h2>
+<ul>
+  <li>locators are a mechanism for finding something in the DOM of a page</li>
+  <li>Identifier</li>
+  <li>Name</li>
+  <li>XPATH</li>
+  <li>CSS</li>
+</ul>
+</div>
+12<hr/>
+<div class="slide"><h2>Locators - Identifier</h2>
+<ul>
+  <li>id=loginForm</li>
+</ul>
+<pre class="brush:xhtml; highlight:[1];">
+		<form id="loginForm"> 
+			<input name="username" type="text" />
+			<input name="password" type="password" />
+			<input name="continue" type="submit" value="Login" />
+			<input name="continue" type="button" value="Clear" />
+		</form>
+</pre>
+</div>
+13<hr/>
+<div class="slide"><h2>Locators - Name</h2>
+<ul>
+  <li>name=username</li>
+</ul>
+<pre class="brush:xhtml; highlight:[2];">
+	   <form id="loginForm">
+	    <input name="username" type="text" />
+	    <input name="password" type="password" />
+	    <input name="continue" type="submit" value="Login" />
+	    <input name="continue" type="button" value="Clear" />
+	   </form>
+</pre>
+</div>
+14<hr/>
+<div class="slide"><h2>Locators - XPath</h2>
+<pre><code>&lt;html&gt;
+  &lt;body&gt;
+   &lt;form id=&quot;loginForm&quot;&gt;
+    &lt;input name=&quot;username&quot; type=&quot;text&quot; /&gt;
+    &lt;input name=&quot;password&quot; type=&quot;password&quot; /&gt;
+    &lt;input name=&quot;continue&quot; type=&quot;submit&quot; value=&quot;Login&quot; /&gt;
+    &lt;input name=&quot;continue&quot; type=&quot;button&quot; value=&quot;Clear&quot; /&gt;
+   &lt;/form&gt;
+  &lt;/body&gt;
+ &lt;html&gt;
+</code></pre>
+<ul>
+  <li>/html/body/form[1] - Absolute path (would break if the HTML was changed only slightly)</li>
+  <li>//form[1] - First form element in the HTML</li>
+  <li>//form[@id='loginForm'] - The form element with attribute named 'id' and the value 'loginForm'</li>
+</ul>
+</div>
+15<hr/>
+<div class="slide"><h2>Locators - XPath</h2>
+<pre><code>&lt;html&gt;
+  &lt;body&gt;
+   &lt;form id=&quot;loginForm&quot;&gt;
+    &lt;input name=&quot;username&quot; type=&quot;text&quot; /&gt;
+    &lt;input name=&quot;password&quot; type=&quot;password&quot; /&gt;
+    &lt;input name=&quot;continue&quot; type=&quot;submit&quot; value=&quot;Login&quot; /&gt;
+    &lt;input name=&quot;continue&quot; type=&quot;button&quot; value=&quot;Clear&quot; /&gt;
+   &lt;/form&gt;
+  &lt;/body&gt;
+ &lt;html&gt;
+</code></pre>
+<ul>
+  <li>//form[input/@name='username'] - First form element with an input child element with attribute named 'name' and the value 'username'</li>
+  <li>//input[@name='username'] - First input element with attribute named 'name' and the value 'username'</li>
+  <li>//form[@id='loginForm']/input[1] - First input child element of the form element with attribute named 'id' and the value 'loginForm'</li>
+</ul>
+</div>
+16<hr/>
+<div class="slide"><h2>Locators - XPath</h2>
+<pre><code>&lt;html&gt;
+  &lt;body&gt;
+   &lt;form id=&quot;loginForm&quot;&gt;
+    &lt;input name=&quot;username&quot; type=&quot;text&quot; /&gt;
+    &lt;input name=&quot;password&quot; type=&quot;password&quot; /&gt;
+    &lt;input name=&quot;continue&quot; type=&quot;submit&quot; value=&quot;Login&quot; /&gt;
+    &lt;input name=&quot;continue&quot; type=&quot;button&quot; value=&quot;Clear&quot; /&gt;
+   &lt;/form&gt;
+  &lt;/body&gt;
+ &lt;html&gt;
+</code></pre>
+<ul>
+  <li>//input[@name='continue'][@type='button'] - Input with attribute named 'name' and the value 'continue' and attribute named 'type' and the value 'button'</li>
+  <li>//form[@id='loginForm']/input[4] - Fourth input child element of the form element with attribute named 'id' and value 'loginForm'</li>
+</ul>
+</div>
+17<hr/>
+<div class="slide"><h2>Xpath resources</h2>
+<ul>
+  <li>W3Schools XPath Tutorial http://www.w3schools.com/Xpath/</li>
+  <li>W3C XPath Recommendation http://www.w3.org/TR/xpath</li>
+</ul>
+</div>
+18<hr/>
+<div class="slide"><h2>Firefox Add-ons for XPath help</h2>
+<ul>
+  <li>XPath Checker - suggests XPath and can be used to test XPath results. (https://addons.mozilla.org/en-US/firefox/addon/1095?id=1095)</li>
+  <li>Firebug - (https://addons.mozilla.org/en-US/firefox/addon/1843)</li>
+</ul>
+</div>
+19<hr/>
+<div class="slide"><h2>Page Object Pattern</h2>
+<ul>
+  <li>DRY</li>
+  <li>class that represents a page (or components of a page) and the elements on that page</li>
+  <li>can also have 'actions' defined for a given page</li>
+  <li>test method "drives" the page objects and performs assertions</li>
+</ul>
+</div>
+20<hr/>
+<div class="slide"><h2>Sample Test</h2>
+<pre class="brush:java; highlight:[];">
+/***
+ * Tests login feature
+ */
+public class Login {
+
+        public void testLogin() {
+                selenium.type("inputBox", "testUser");
+                selenium.type("password", "my supersecret password");
+                selenium.click("sign-in");
+                selenium.waitForPageToLoad("PageWaitPeriod");
+                Assert.assertTrue(selenium.isElementPresent("compose button"),
+                                "Login was unsuccessful");
+        }
+}
+</pre>
+</div>
+21<hr/>
+<div class="slide"><h2>problems with this approach</h2>
+<ul>
+  <li>no separation between the test method and the IDs - tightly coupled into the test</li>
+  <li>doesn't allow reuse of the "login" functionality</li>
+  <li>doesn't allow reuse of the locators</li>
+  <li>difficult to maintain as test suite grows and application changes</li>
+</ul>
+</div>
+22<hr/>
+<div class="slide"><h2>proposed solution:</h2>
+<pre class="brush:java; highlight:[];">
+
+	/**
+	 * Page Object encapsulates the Sign-in page.
+	 */
+	public class SignInPage {
+
+	        private Selenium selenium;
+
+	        public SignInPage(Selenium selenium) {
+	                this.selenium = selenium;
+	                if(!selenium.getTitle().equals("Sign in page")) {
+	                        throw new IllegalStateException("This is not sign in page, current page is: "
+	                                        +selenium.getLocation());
+	                }
+	        }
+
+			//...continued
+</pre>
+</div>
+23<hr/>
+<div class="slide">
+<pre class="brush:java; highlight:[];">
+	
+	        /**
+	         * Login as valid user
+	         *
+	         * @param userName
+	         * @param password
+	         * @return HomePage object
+	         */
+	        public HomePage loginValidUser(String userName, String password) {
+	                selenium.type("usernamefield", userName);
+	                selenium.type("passwordfield", password);
+	                selenium.click("sign-in");
+	                selenium.waitForPageToLoad("waitPeriod");
+
+	                return new HomePage(selenium);
+	        }
+	}
+</pre>
+</div>
+24<hr/>
+<div class="slide">
+<pre class="brush:java; highlight:[];">
+	/**
+	 * Page Object encapsulates the Home Page
+	 */
+	public class HomePage {
+
+	        private Selenium selenium;
+
+	        public HomePage(Selenium selenium) {
+	                if (!selenium.getTitle().equals("Home Page of logged in user")) {
+	                        throw new IllegalStateException("This is not Home Page of logged in user, current page" +
+	                                        "is: " +selenium.getLocation());
+	                }
+	        }
+
+	        public HomePage manageProfile() {
+	                // Page encapsulation to manage profile functionality
+	                return new HomePage(selenium);
+	        }
+
+	        /*More methods offering the services represented by Home Page
+	        of Logged User. These methods in turn might return more Page Objects
+	        for example click on Compose mail button could return ComposeMail class object*/
+
+	}
+</pre>
+</div>
+25<hr/>
+<div class="slide"><h2>now the test looks more like this:</h2>
+<pre class="brush:java; highlight:[];">
+
+	/***
+	 * Tests login feature
+	 */
+	public class TestLogin {
+
+	        public void testLogin() {
+	                SignInPage signInPage = new SignInPage(selenium);
+	                HomePage homePage = signInPage.loginValidUser("userName", "password");
+	                Assert.assertTrue(selenium.isElementPresent("compose button"),
+	                                "Login was unsuccessful");
+	        }
+	}
+</pre>
+</div>
+26<hr/>
+<div class="slide"><h2>Geb</h2>
+<ul>
+  <li>Groovy Domain Specific Language wrapper on top of web driver</li>
+  <li>JQuery-like selectors</li>
+  <li>Page Object first class citizen (and extension with Modules)</li>
+  <li>http://www.gebish.org/</li>
+</ul>
+</div>
+27<hr/>
+<div class="slide"><h2>Geb Selectors</h2>
+<pre class="brush:groovy; highlight:[];">
+	// match all 'div' elements on the page
+	$("div")
+ 
+	// match the first 'div' element on the page
+	$("div", 0)
+ 
+	// match all 'div' elements with a title attribute value of 'section'
+	$("div", title: "section")
+ 
+	// match the first 'div' element with a title attribute value of 'section'
+	$("div", 0, title: "section")
+ 
+	// match all 'div' elements who have the class 'main'
+	$("div.main") 
+ 
+	// match the first 'div' element with the class 'main'
+	$("div.main", 0)
+</pre>
+</div>
+28<hr/>
+<div class="slide"><h2>Scripting with Geb</h2>
+<pre class="brush:groovy;">
+	import geb.Browser
+	Browser.drive {
+	    go "http://google.com/ncr"
+
+	    // make sure we actually got to the page
+	    assert title == "Google"
+
+	    // enter wikipedia into the search field
+	    $("input", name: "q").value("wikipedia")
+
+	    // wait for the change to results page to happen
+	    // (google updates the page dynamically without a new request)
+	    waitFor { title.endsWith("Google Search") }
+
+	    // is the first link to wikipedia?
+	    def firstLink = $("li.g", 0).find("a.l")
+	    assert firstLink.text() == "Wikipedia"
+
+	    // click the link 
+	    firstLink.click()
+
+	    // wait for Google's javascript to redirect to Wikipedia
+	    waitFor { title == "Wikipedia" }
+	}	
+</pre>
+</div>
+29<hr/>
+<div class="slide"><h2>Module Objects</h2>
+<pre class="brush:groovy;">
+	// modules are reusable fragments that can be used across pages that can be paramaterised
+	// here we are using a module to model the search function on the home and results pages
+	class GoogleSearchModule extends Module {
+
+	    // a paramaterised value set when the module is included
+	    def buttonValue
+
+	    // the content DSL
+	    static content = {
+
+	        // name the search input control “field”, defining it with the jQuery like navigator
+	        field { $("input", name: "q") }
+
+	        // the search button declares that it takes us to the results page, and uses the 
+	        // parameterised buttonValue to define itself
+	        button(to: GoogleResultsPage) { 
+	            $("input", value: buttonValue)
+	        }
+	    }
+	}	
+</pre>
+</div>
+30<hr/>
+<div class="slide"><h2>Page Objects</h2>
+<pre class="brush:groovy;">
+	class GoogleHomePage extends Page {
+
+	    // pages can define their location, either absolutely or relative to a base
+	    static url = "http://google.com/ncr"
+
+	    // “at checkers” allow verifying that the browser is at the expected page
+	    static at = { title == "Google" }
+
+	    static content = {
+	        // include the previously defined module
+	        search { module GoogleSearchModule, buttonValue: "Google Search" }
+	    }
+	}
+</pre>
+</div>
+31<hr/>
+<div class="slide"><h2>Page Objects</h2>
+<pre class="brush:groovy;">
+	class GoogleResultsPage extends Page {
+	    static at = { title.endsWith "Google Search" }
+	    static content = {
+	        // reuse our previously defined module
+	        search { module GoogleSearchModule, buttonValue: "Search" }
+
+	        // content definitions can compose and build from other definitions
+	        results { $("li.g") }
+	        result { i -> results[i] }
+	        resultLink { i -> result(i).find("a.l") }
+	        firstResultLink { resultLink(0) }
+	    }
+	}
+
+	class WikipediaPage extends Page {
+	    static at = { title == "Wikipedia" } 
+	}
+</pre>
+</div>
+32<hr/>
+<div class="slide"><h2>Script with Page Objects</h2>
+<pre class="brush:groovy;">
+	Browser.drive {
+	    to GoogleHomePage
+	    assert at(GoogleHomePage)
+	    search.field.value("wikipedia")
+	    waitFor { at GoogleResultsPage }
+	    assert firstResultLink.text() == "Wikipedia"
+	    firstResultLink.click()
+	    waitFor { at WikipediaPage }
+	}
+</pre>
+</div>
+33<hr/>
+<div class="slide"><h2>References</h2>
+<ul>
+  <li>http://seleniumhq.org/docs/</li>
+  <li>https://github.com/iainrose/page-objects</li>
+  <li>http://mattoncloud.blogspot.com/2011/06/selenium-webdriver-linux-headless-ruby.html</li>
+  <li>http://blog.andresteingress.com/wp-content/uploads/2011/04/Geb_Confess.pdf</li>
+  <li>http://www.gebish.org/manual/current</li>
+</ul>
+
+</div>
+
+<p class="attribution" style="font-size:0.6em;"><a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/80x15.png" /></a> &nbsp;Mike Hugo, <a href="http://piragua.com">Piragua Consulting, Inc.</a>
+</p>
+
+
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shCore.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushPlain.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushCss.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushGroovy.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushJava.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushSql.js" type="text/javascript"></script>
+<script src="../deck.js.custom/syntaxhighlighter/scripts/shBrushXml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	SyntaxHighlighter.defaults['toolbar'] = false;
+    SyntaxHighlighter.all()
+</script>
+
+</body>
+</html>
