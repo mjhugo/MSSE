@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project relativePaths="false" version="4">
+  <component name="ProjectFileVersion" converted="true" />
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/gebish.iml" filepath="$PROJECT_DIR$/gebish.iml" />
+    </modules>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="libraryTable">
+    <library name="Grails 2.0.1">
+      <CLASSES>
+        <root url="jar:///opt/java/grails/dist/grails-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-bootstrap-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-core-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-crud-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-docs-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-hibernate-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-logging-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-async-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-codecs-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-controllers-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-converters-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-datasource-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-domain-class-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-filters-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-gsp-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-i18n-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-log4j-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-mimetypes-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-scaffolding-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-services-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-servlets-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-testing-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-tomcat-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-url-mappings-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-plugin-validation-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-resources-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-scripts-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-spring-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-test-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-test-suite-base-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-web-2.0.1.jar!/" />
+
+<root url="jar:///opt/java/grails/dist/grails-webflow-2.0.1.jar!/" />
+
+
+      </CLASSES>
+    </library>
+  </component>
+</project>
