@@ -60,5 +60,5 @@ codenarc.reports = {
     }
 }
 codenarc.propertiesFile = 'grails-app/conf/codenarc.properties'
-codenarc.ruleSetFiles = 'rulesets/basic.xml,rulesets/exceptions.xml, rulesets/imports.xml,rulesets/grails.xml, rulesets/unused.xml, rulesets/logging.xml, rulesets/junit.xml'
+codenarc.ruleSetFiles = 'rulesets/basic.xml,rulesets/concurrency.xml,rulesets/convention.xml,,rulesets/dry.xml,rulesets/exceptions.xml, rulesets/imports.xml,rulesets/grails.xml, rulesets/groovyism.xml, rulesets/generic.xml, rulesets/unused.xml, rulesets/security.xml, rulesets/logging.xml, rulesets/junit.xml'
 codenarc.maxPriority1Violations=0
