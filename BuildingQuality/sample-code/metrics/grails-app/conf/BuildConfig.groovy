@@ -49,3 +49,16 @@ grails.project.dependency.resolution = {
         build ":tomcat:$grailsVersion"
     }
 }
+codenarc.reports = {
+    MyXmlReport('xml') {                    // The report name "MyXmlReport" is user-defined; Report type is 'xml'
+        outputFile = 'target/codenarc/CodeNarc-Report.xml'  // Set the 'outputFile' property of the (XML) Report
+        title = 'CodeNarc XML Report'             // Set the 'title' property of the (XML) Report
+    }
+    MyHtmlReport('html') {                  // Report type is 'html'
+        outputFile = 'target/codenarc/CodeNarc-Report.html'
+        title = 'CodeNarc HTML Report'
+    }
+}
+codenarc.propertiesFile = 'grails-app/conf/codenarc.properties'
+codenarc.ruleSetFiles = 'rulesets/basic.xml,rulesets/exceptions.xml, rulesets/imports.xml,rulesets/grails.xml, rulesets/unused.xml, rulesets/logging.xml, rulesets/junit.xml'
+codenarc.maxPriority1Violations=0

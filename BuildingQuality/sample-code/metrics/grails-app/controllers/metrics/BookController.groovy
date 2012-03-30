@@ -60,6 +60,7 @@ class BookController {
             return
         }
 
+        println params.version
         if (params.version) {
             def version = params.version.toLong()
             if (bookInstance.version > version) {

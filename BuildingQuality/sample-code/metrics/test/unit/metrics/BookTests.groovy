@@ -12,6 +12,8 @@ import org.junit.*
 class BookTests {
 
     void testSomething() {
-       fail "Implement me"
+        Book b = new Book(title: 'title')
+        b.save()
+        assert !b.hasErrors()
     }
 }

@@ -1,9 +1,8 @@
 package metrics
 
-
-
-import org.junit.*
-import grails.test.mixin.*
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.springframework.dao.DataIntegrityViolationException
 
 @TestFor(BookController)
 @Mock(Book)
@@ -12,8 +11,7 @@ class BookControllerTests {
 
     def populateValidParams(params) {
       assert params != null
-      // TODO: Populate valid properties like...
-      //params["name"] = 'someValidName'
+      params["title"] = 'someValidTitle'
     }
 
     void testIndex() {
@@ -27,6 +25,19 @@ class BookControllerTests {
 
         assert model.bookInstanceList.size() == 0
         assert model.bookInstanceTotal == 0
+    }
+
+    void testList_maxParams() {
+        params.max = 10
+
+        (1..20).each {
+            new Book(title:it).save(failOnError: true)
+        }
+
+        def model = controller.list()
+
+        assert model.bookInstanceList.size() == params.max
+        assert model.bookInstanceTotal == Book.count()
     }
 
     void testCreate() {
@@ -97,15 +108,16 @@ class BookControllerTests {
 
         response.reset()
 
-
         populateValidParams(params)
         def book = new Book(params)
-
         assert book.save() != null
+        book.version = 1
+        assert book.save() != null
+
 
         // test invalid parameters in update
         params.id = book.id
-        //TODO: add invalid values to params object
+        params.title = null
 
         controller.update()
 
@@ -119,6 +131,19 @@ class BookControllerTests {
 
         assert response.redirectedUrl == "/book/show/$book.id"
         assert flash.message != null
+
+        // test with valid version number
+        assert book.version == 1
+        response.reset()
+        book.clearErrors()
+
+        populateValidParams(params)
+        params.version = book.version
+        controller.update()
+
+        assert response.redirectedUrl == "/book/show/$book.id"
+        assert flash.message != null
+
 
         //test outdated version number
         response.reset()
@@ -156,4 +181,24 @@ class BookControllerTests {
         assert Book.get(book.id) == null
         assert response.redirectedUrl == '/book/list'
     }
+
+    void testDelete_mockDataIntegrityConstriant() {
+        Book.metaClass.'static'.delete = {Map args->
+            throw new DataIntegrityViolationException('BOOM!')
+        }
+
+        populateValidParams(params)
+        def book = new Book(params)
+
+        assert book.save() != null
+        assert Book.count() == 1
+
+        params.id = book.id
+        controller.delete()
+        assert response.redirectedUrl == "/book/show/$book.id"
+        assert flash.message != null
+
+    }
+
+
 }
